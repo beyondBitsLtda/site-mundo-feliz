@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="ext-resource-dependency" content="uploads/toy1.png" data-resource-id="toy1" />
+<meta name="ext-resource-dependency" content="uploads/toy2.png" data-resource-id="toy2" />
+<meta name="ext-resource-dependency" content="uploads/toy3.png" data-resource-id="toy3" />
+<script src="./support.js"></script>
+</head>
+<body>
+<template id="__bundler_thumbnail" data-bg-color="#1ea7ff">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#1ea7ff"/>
+    <circle cx="600" cy="400" r="190" fill="#2a6fdb"/>
+    <circle cx="600" cy="400" r="190" fill="none" stroke="#ffffff" stroke-width="10" opacity="0.6"/>
+    <circle cx="330" cy="250" r="60" fill="#e63950"/>
+    <circle cx="880" cy="540" r="80" fill="#2a4fd6"/>
+    <circle cx="900" cy="220" r="34" fill="#f06a25"/>
+    <text x="600" y="430" font-family="Georgia, serif" font-style="italic" font-weight="700" font-size="120" fill="#ffffff" text-anchor="middle">MF</text>
+  </svg>
+</template>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,800;1,9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    color: #0a2540;
+    overflow-x: hidden;
+    /* Céu natural de dia: azul vibrante no topo desvanecendo para tons mais claros */
+    background:
+      linear-gradient(180deg,
+        #1ea7ff 0%,
+        #3bb6ff 25%,
+        #6cc8ff 50%,
+        #9fdcff 75%,
+        #cfecff 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  * { box-sizing: border-box; }
+  img { display: block; user-select: none; -webkit-user-drag: none; pointer-events: none; }
+  .parallax { will-change: transform; transform: translate3d(0,0,0); }
+  @media (prefers-reduced-motion: reduce) {
+    .parallax { transform: none !important; }
+  }
+</style>
+</helmet>
+
+<main style="position:relative; width:100%; overflow:hidden;">
+
+  <!-- ============================================== -->
+  <!-- 1. HERO PRINCIPAL                              -->
+  <!-- ============================================== -->
+  <section id="hero" style="position:relative; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:80px 24px; overflow:hidden;">
+
+    <!-- bolinhas atrás do logo (parallax: sobem na rolagem) -->
+    <img class="parallax" data-speed="-0.55" data-scale="1.05" src="uploads/estilo (3).png" alt=""
+      style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.95; z-index:1;">
+
+    <!-- logo central -->
+    <div style="position:relative; z-index:3; text-align:center; width:100%; max-width:1220px; display:flex; flex-direction:column; align-items:center;">
+      <img src="uploads/assets hero - globo e mundo feliz.png" alt="Mundo Feliz - Locações de Brinquedos"
+        style="width:min(98vw, 1180px); height:auto; display:block; margin:0 auto; filter: drop-shadow(0 24px 50px rgba(0, 30, 80, 0.28));">
+      <div style="margin-top:24px; display:flex; gap:16px; justify-content:center; flex-wrap:wrap;">
+        <a href="#catalogo" style="display:inline-block; background:#ffffff; color:#0a2540; text-decoration:none; padding:16px 32px; border-radius:999px; font-weight:600; font-size:16px; box-shadow:0 12px 30px rgba(0,30,80,0.18); transition:transform .2s ease;"
+          style-hover="transform: translateY(-2px);">Ver Brinquedos</a>
+        <a href="#contato" style="display:inline-block; background:transparent; color:#ffffff; text-decoration:none; padding:16px 32px; border-radius:999px; font-weight:600; font-size:16px; border:2px solid rgba(255,255,255,0.7); transition:background .2s ease;"
+          style-hover="background: rgba(255,255,255,0.15);">Falar no WhatsApp</a>
+      </div>
+    </div>
+
+    <!-- scroll cue -->
+    <div style="position:absolute; bottom:24px; left:50%; transform:translateX(-50%); z-index:5; color:#ffffff; font-size:12px; letter-spacing:0.3em; opacity:0.85; text-transform:uppercase;">
+      role para baixo ↓
+    </div>
+  </section>
+
+  <!-- ============================================== -->
+  <!-- 2. SEÇÃO DE CATÁLOGO                           -->
+  <!-- ============================================== -->
+  <section id="catalogo" style="position:relative; padding:120px 24px 80px; overflow:visible;">
+
+    <!-- crianças pulando — GRANDES, unindo as seções: braços sobem para o fim do
+         hero e pernas invadem a última seção (overflow visível + altura grande) -->
+    <img class="parallax" data-speed="-0.16" data-float="1" src="uploads/kid-boy.png" alt="Menino pulando feliz"
+      style="position:absolute; left:max(-44vw, -720px); top:-120px; height:clamp(1120px, 134vh, 1340px); width:auto; z-index:1; filter:drop-shadow(0 22px 30px rgba(0,30,80,0.22)); pointer-events:none;">
+    <img class="parallax" data-speed="-0.22" data-float="1" src="uploads/kid-girl.png" alt="Menina pulando feliz"
+      style="position:absolute; right:max(-44vw, -720px); top:-90px; height:clamp(1160px, 138vh, 1380px); width:auto; z-index:1; filter:drop-shadow(0 22px 30px rgba(0,30,80,0.22)); pointer-events:none;">
+
+    <div style="position:relative; z-index:3; max-width:1200px; margin:0 auto;">
+
+      <div style="text-align:center; margin-bottom:64px;">
+        <span style="display:inline-block; background:rgba(255,255,255,0.55); backdrop-filter:blur(6px); color:#0a2540; padding:6px 16px; border-radius:999px; font-size:12px; font-weight:600; letter-spacing:0.2em; text-transform:uppercase;">Catálogo</span>
+        <h2 style="margin:20px 0 12px; font-family:'Fraunces', serif; font-weight:700; font-style:italic; font-size:clamp(40px, 6vw, 72px); color:#ffffff; line-height:1.05; text-shadow:0 6px 20px rgba(0,30,80,0.22);">
+          Brinquedos que fazem<br>a festa acontecer
+        </h2>
+        <p style="margin:0 auto; max-width:580px; color:#0a2540; opacity:0.85; font-size:18px; line-height:1.55;">
+          Aluguel completo com entrega, montagem e retirada. Brinquedos higienizados e prontos para diversão.
+        </p>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:32px; max-width:1080px; margin:0 auto;">
+        <sc-for list="{{ toys }}" as="t" hint-placeholder-count="3">
+          <article style="position:relative; aspect-ratio:4/5; overflow:hidden; border-radius:22px; box-shadow:0 18px 44px rgba(0,30,80,0.26); transition:transform .35s ease, box-shadow .35s ease;"
+            style-hover="transform: translateY(-6px); box-shadow: 0 26px 58px rgba(0,30,80,0.34);">
+            <img src="{{ t.img }}" alt="{{ t.name }}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;">
+            <!-- fade preto p/ legibilidade do texto -->
+            <div style="position:absolute; left:0; right:0; bottom:0; height:62%; background:linear-gradient(180deg, rgba(8,16,30,0) 0%, rgba(8,16,30,0.55) 55%, rgba(8,16,30,0.88) 100%);"></div>
+            <div style="position:absolute; left:0; right:0; bottom:0; padding:24px; display:flex; align-items:flex-end; justify-content:space-between; gap:14px;">
+              <h3 style="margin:0; font-family:'Fraunces', serif; font-weight:600; font-size:24px; line-height:1.15; color:#ffffff;">{{ t.name }}</h3>
+              <span style="flex:none; font-family:'Inter',sans-serif; font-weight:700; font-size:16px; color:#ffffff; background:rgba(255,255,255,0.18); backdrop-filter:blur(4px); padding:7px 12px; border-radius:999px; white-space:nowrap;">{{ t.price }}</span>
+            </div>
+          </article>
+        </sc-for>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============================================== -->
+  <!-- 3. ÚLTIMO HERO / CONTATO                       -->
+  <!-- ============================================== -->
+  <section id="contato" style="position:relative; min-height:100vh; padding:120px 0 0; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:flex-start;">
+
+    <!-- bolinhas voando — sobem só perto do FINAL da página (speed positivo:
+         entram baixas/escondidas e só se elevam ao chegar no fim) -->
+    <img class="parallax" data-speed="0.75" data-scale="1.10" src="uploads/estilo (1).png" alt=""
+      style="position:absolute; left:0; bottom:0; width:100%; height:auto; z-index:4; opacity:0.95; pointer-events:none;">
+
+    <div style="position:relative; z-index:5; max-width:780px; text-align:center; padding:40px 24px 0;">
+      <span style="display:inline-block; background:#fff; color:#0a2540; padding:6px 16px; border-radius:999px; font-size:12px; font-weight:600; letter-spacing:0.2em; text-transform:uppercase;">Reserve agora</span>
+      <h2 style="margin:20px 0 16px; font-family:'Fraunces', serif; font-weight:800; font-style:italic; font-size:clamp(44px, 7vw, 88px); color:#ffffff; line-height:1.0; text-shadow:0 8px 24px rgba(0,30,80,0.25);">
+        Vamos fazer a sua festa virar lembrança?
+      </h2>
+      <p style="margin:0 auto 36px; max-width:560px; color:#ffffff; opacity:0.95; font-size:18px; line-height:1.55;">
+        Atendimento rápido pelo WhatsApp. Orçamento na hora, datas em tempo real e tudo prontinho para o grande dia.
+      </p>
+
+      <!-- CTA WhatsApp -->
+      <a href="https://wa.me/5511999999999?text=Ol%C3%A1!%20Quero%20um%20or%C3%A7amento%20para%20locar%20brinquedos%20com%20a%20Mundo%20Feliz."
+        target="_blank" rel="noopener"
+        style="display:inline-flex; align-items:center; gap:14px; background:#25D366; color:#ffffff; text-decoration:none; padding:22px 40px; border-radius:999px; font-weight:700; font-size:22px; box-shadow:0 20px 50px rgba(37,211,102,0.45); transition:transform .25s ease, box-shadow .25s ease;"
+        style-hover="transform: translateY(-3px); box-shadow: 0 28px 60px rgba(37,211,102,0.55);">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zM18.062 14.382c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+        </svg>
+        Falar no WhatsApp
+      </a>
+
+      <p style="margin-top:24px; color:#ffffff; font-size:14px; opacity:0.85;">
+        ou ligue: <strong>(11) 99999-9999</strong>
+      </p>
+    </div>
+
+    <!-- piscina de bolinhas no rodapé — ocupa 100% da largura -->
+    <img src="uploads/assets psicina de bolinha.png" alt=""
+      style="position:relative; z-index:2; margin-top:auto; width:100%; height:auto; display:block;">
+
+    <footer style="position:relative; z-index:3; width:100%; padding:24px; text-align:center; color:#0a2540; font-size:13px; background:rgba(255,255,255,0.0);">
+      © Mundo Feliz · Locações de Brinquedos
+    </footer>
+  </section>
+
+</main>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    // Em modo standalone, as imagens vêm de window.__resources (blob URLs).
+    const R = (typeof window !== 'undefined' && window.__resources) || {};
+    return {
+      toys: [
+        { name: 'Piscina de Bolinhas', desc: 'Mergulho de diversão colorido para os pequenos.', price: 'R$ 250/dia',
+          img: R.toy1 || 'uploads/toy1.png' },
+        { name: 'Barco Pirata', desc: 'Tobogã inflável gigante em forma de navio pirata.', price: 'R$ 480/dia',
+          img: R.toy2 || 'uploads/toy2.png' },
+        { name: 'Tenda de Bolinhas', desc: 'Tenda inflável espaçosa, perfeita para festas em casa.', price: 'R$ 380/dia',
+          img: R.toy3 || 'uploads/toy3.png' }
+      ]
+    };
+  }
+
+  componentDidMount() {
+    // ============================================================
+    // CONFIGURAÇÃO DO PARALLAX
+    // Ajuste estes valores para controlar a intensidade do efeito:
+    //   data-speed   no HTML: velocidade vertical (negativo = sobe ao rolar)
+    //   data-scale   no HTML: zoom máximo ao final da rolagem
+    //   data-float   no HTML: ativa flutuação suave senoidal
+    //
+    // FLOAT_AMPLITUDE: amplitude (px) da flutuação senoidal
+    // FLOAT_SPEED:     velocidade da flutuação (rad/ms)
+    // ============================================================
+    const FLOAT_AMPLITUDE = 14;
+    const FLOAT_SPEED = 0.0008;
+
+    // Limite (px) de quanto um elemento pode se deslocar — evita que as
+    // bolinhas "voem para fora" da seção em parallax agressivo.
+    const MAX_SHIFT = 260;
+
+    const root = this.$root || document;
+    const layers = Array.from(root.querySelectorAll('.parallax'));
+    if (!layers.length) return;
+
+    // Cache dos atributos por elemento. Usamos a SEÇÃO como referência de
+    // medição (ela nunca recebe transform), evitando o loop de feedback que
+    // fazia os elementos dispararem para fora da tela.
+    const items = layers.map(el => ({
+      el,
+      ref: el.closest('section') || el.parentElement,
+      speed: parseFloat(el.dataset.speed) || 0,
+      scale: parseFloat(el.dataset.scale) || 1,
+      float: el.dataset.float === '1'
+    }));
+
+    let ticking = false;
+    let mounted = true;
+    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+    const apply = (t) => {
+      const vh = window.innerHeight || 1;
+      for (let i = 0; i < items.length; i++) {
+        const it = items[i];
+        const r = it.ref.getBoundingClientRect();   // referência SEM transform
+        const sectionCenter = r.top + r.height / 2;
+        const delta = sectionCenter - vh / 2;        // px, estável
+
+        // Translação do parallax (limitada p/ manter tudo visível)
+        let ty = clamp(delta * it.speed, -MAX_SHIFT, MAX_SHIFT);
+
+        // Flutuação senoidal sutil (crianças do catálogo)
+        if (it.float) {
+          ty += Math.sin(t * FLOAT_SPEED) * FLOAT_AMPLITUDE;
+        }
+
+        // Escala progressiva conforme a seção entra na viewport (0..1)
+        const enter = clamp(1 - (r.top / vh), 0, 1);
+        const sc = 1 + (it.scale - 1) * enter;
+
+        it.el.style.transform = `translate3d(0, ${ty.toFixed(2)}px, 0) scale(${sc.toFixed(3)})`;
+      }
+      ticking = false;
+      if (mounted && items.some(it => it.float)) {
+        requestAnimationFrame(apply); // loop contínuo p/ flutuação
+      }
+    };
+
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(apply);
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    requestAnimationFrame(apply); // primeiro frame
+
+    this._cleanupParallax = () => {
+      mounted = false;
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }
+
+  componentWillUnmount() {
+    if (this._cleanupParallax) this._cleanupParallax();
+  }
+}
+</script>
+</body>
+</html>
