@@ -103,17 +103,15 @@
   @media (max-width: 768px) {
 
     /* --- 1) HERO PRINCIPAL: globo BEM maior e CENTRALIZADO ---
-       O <img> tem `margin:0 auto` inline. Como ele fica wider que
-       a viewport, precisamos zerar a margin e forçar o centro
-       absoluto com left:50% + translateX(-50%). Assim ele estoura
-       igual nos dois lados em vez de vazar só para a direita. */
+       O pai já é `display:flex; align-items:center`, então basta
+       zerar a margin inline e ele se centraliza sozinho mesmo
+       sendo wider que a viewport (estoura igual nos dois lados).
+       NÃO usar left:50% + translateX(-50%) aqui — causa dupla
+       centralização e joga o globo pra esquerda. */
     #hero .hero-logo {
       width: 130vw !important;
       max-width: none !important;
       margin: 0 !important;
-      position: relative;
-      left: 50%;
-      transform: translateX(-50%);
     }
 
     /* --- 2) CATÁLOGO: crianças PEQUENAS, UMA EM CADA CANTO ---
