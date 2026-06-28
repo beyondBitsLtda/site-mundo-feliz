@@ -25,6 +25,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,800;1,9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- ============================================================ -->
+<!-- PERFORMANCE: preload das imagens críticas do hero (above-fold) -->
+<!-- ============================================================ -->
+<link rel="preload" as="image" href="uploads/assets hero - globo e mundo feliz.png" fetchpriority="high">
+<link rel="preload" as="image" href="uploads/estilo (3).png">
+
 <style>
   html, body { margin: 0; padding: 0; }
   body {
@@ -48,6 +55,78 @@
   @media (prefers-reduced-motion: reduce) {
     .parallax { transform: none !important; }
   }
+
+  /* ============================================================
+     REVIEWS (Google Maps style) — desktop default
+     ============================================================ */
+  .reviews-section {
+    position: relative;
+    z-index: 5;
+    width: 100%;
+    max-width: 1100px;
+    margin: 80px auto 0;
+    padding: 0 24px;
+  }
+  .reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .review-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 14px 34px rgba(0,30,80,0.18);
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .review-head { display: flex; align-items: center; gap: 12px; }
+  .review-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: linear-gradient(135deg, #4285F4, #34A853);
+    color: #fff; font-weight: 700; font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    flex: none;
+  }
+  .review-name { font-weight: 600; color: #0a2540; font-size: 15px; line-height: 1.2; }
+  .review-meta { font-size: 12px; color: #5f6368; margin-top: 2px; }
+  .review-stars { color: #fbbc04; font-size: 16px; letter-spacing: 1px; }
+  .review-text { color: #202124; font-size: 14px; line-height: 1.55; margin: 0; }
+
+  /* ============================================================
+     ============== AJUSTES SOMENTE MOBILE ======================
+     Tudo abaixo afeta APENAS telas <= 768px (mobile).
+     Nada do desktop é alterado.
+     ============================================================ */
+  @media (max-width: 768px) {
+
+    /* --- 1) HERO PRINCIPAL: globo bem maior no mobile -------- */
+    #hero .hero-logo {
+      width: 140vw !important;          /* estoura largura propositalmente p/ ficar gigante */
+      max-width: none !important;
+      margin-left: -20vw;               /* recentraliza após estourar */
+    }
+
+    /* --- 2) CATÁLOGO: crianças MENORES e SEPARADAS ---------- */
+    #catalogo .kid-boy {
+      height: clamp(360px, 60vh, 480px) !important;
+      left: -18vw !important;            /* fica colada à borda esquerda, sem invadir o centro */
+      top: -40px !important;
+    }
+    #catalogo .kid-girl {
+      height: clamp(360px, 60vh, 480px) !important;
+      right: -18vw !important;           /* colada à borda direita */
+      top: -20px !important;
+    }
+    /* dá um respiro lateral para o conteúdo do catálogo não encostar nas crianças */
+    #catalogo { padding-top: 80px; }
+
+    /* --- 3) REVIEWS: cards em coluna única no mobile -------- */
+    .reviews-grid { grid-template-columns: 1fr; gap: 14px; }
+    .reviews-section { margin-top: 56px; }
+  }
 </style>
 </helmet>
 
@@ -60,11 +139,13 @@
 
     <!-- bolinhas atrás do logo (parallax: sobem na rolagem) -->
     <img class="parallax" data-speed="-0.55" data-scale="1.05" src="uploads/estilo (3).png" alt=""
+      fetchpriority="high" decoding="async"
       style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.95; z-index:1;">
 
     <!-- logo central -->
     <div style="position:relative; z-index:3; text-align:center; width:100%; max-width:1220px; display:flex; flex-direction:column; align-items:center;">
-      <img src="uploads/assets hero - globo e mundo feliz.png" alt="Mundo Feliz - Locações de Brinquedos"
+      <img class="hero-logo" src="uploads/assets hero - globo e mundo feliz.png" alt="Mundo Feliz - Locações de Brinquedos"
+        fetchpriority="high" decoding="async"
         style="width:min(98vw, 1180px); height:auto; display:block; margin:0 auto; filter: drop-shadow(0 24px 50px rgba(0, 30, 80, 0.28));">
       <div style="margin-top:24px; display:flex; gap:16px; justify-content:center; flex-wrap:wrap;">
         <a href="#catalogo" style="display:inline-block; background:#ffffff; color:#0a2540; text-decoration:none; padding:16px 32px; border-radius:999px; font-weight:600; font-size:16px; box-shadow:0 12px 30px rgba(0,30,80,0.18); transition:transform .2s ease;"
@@ -87,9 +168,11 @@
 
     <!-- crianças pulando — GRANDES, unindo as seções: braços sobem para o fim do
          hero e pernas invadem a última seção (overflow visível + altura grande) -->
-    <img class="parallax" data-speed="-0.16" data-float="1" src="uploads/kid-boy.png" alt="Menino pulando feliz"
+    <img class="parallax kid-boy" data-speed="-0.16" data-float="1" src="uploads/kid-boy.png" alt="Menino pulando feliz"
+      loading="lazy" decoding="async"
       style="position:absolute; left:max(-44vw, -720px); top:-120px; height:clamp(1120px, 134vh, 1340px); width:auto; z-index:1; filter:drop-shadow(0 22px 30px rgba(0,30,80,0.22)); pointer-events:none;">
-    <img class="parallax" data-speed="-0.22" data-float="1" src="uploads/kid-girl.png" alt="Menina pulando feliz"
+    <img class="parallax kid-girl" data-speed="-0.22" data-float="1" src="uploads/kid-girl.png" alt="Menina pulando feliz"
+      loading="lazy" decoding="async"
       style="position:absolute; right:max(-44vw, -720px); top:-90px; height:clamp(1160px, 138vh, 1380px); width:auto; z-index:1; filter:drop-shadow(0 22px 30px rgba(0,30,80,0.22)); pointer-events:none;">
 
     <div style="position:relative; z-index:3; max-width:1200px; margin:0 auto;">
@@ -108,7 +191,7 @@
         <sc-for list="{{ toys }}" as="t" hint-placeholder-count="3">
           <article style="position:relative; aspect-ratio:4/5; overflow:hidden; border-radius:22px; box-shadow:0 18px 44px rgba(0,30,80,0.26); transition:transform .35s ease, box-shadow .35s ease;"
             style-hover="transform: translateY(-6px); box-shadow: 0 26px 58px rgba(0,30,80,0.34);">
-            <img src="{{ t.img }}" alt="{{ t.name }}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;">
+            <img src="{{ t.img }}" alt="{{ t.name }}" loading="lazy" decoding="async" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;">
             <!-- fade preto p/ legibilidade do texto -->
             <div style="position:absolute; left:0; right:0; bottom:0; height:62%; background:linear-gradient(180deg, rgba(8,16,30,0) 0%, rgba(8,16,30,0.55) 55%, rgba(8,16,30,0.88) 100%);"></div>
             <div style="position:absolute; left:0; right:0; bottom:0; padding:24px; display:flex; align-items:flex-end; justify-content:space-between; gap:14px;">
@@ -130,6 +213,7 @@
     <!-- bolinhas voando — sobem só perto do FINAL da página (speed positivo:
          entram baixas/escondidas e só se elevam ao chegar no fim) -->
     <img class="parallax" data-speed="0.75" data-scale="1.10" src="uploads/estilo (1).png" alt=""
+      loading="lazy" decoding="async"
       style="position:absolute; left:0; bottom:0; width:100%; height:auto; z-index:4; opacity:0.95; pointer-events:none;">
 
     <div style="position:relative; z-index:5; max-width:780px; text-align:center; padding:40px 24px 0;">
@@ -157,8 +241,70 @@
       </p>
     </div>
 
+    <!-- ============================================== -->
+    <!-- 3.1 AVALIAÇÕES (estilo Google Maps - fake)     -->
+    <!-- ============================================== -->
+    <section class="reviews-section" aria-label="Avaliações de clientes">
+      <div style="text-align:center; margin-bottom:28px;">
+        <div style="display:inline-flex; align-items:center; gap:10px; background:#fff; padding:10px 18px; border-radius:999px; box-shadow:0 10px 24px rgba(0,30,80,0.16);">
+          <!-- Google "G" colorido -->
+          <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
+            <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z"/>
+            <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 13 24 13c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+            <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35 26.7 36 24 36c-5.3 0-9.7-3.1-11.3-7.5l-6.5 5C9.5 39.6 16.2 44 24 44z"/>
+            <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.1 5.6l6.2 5.2c-.4.4 6.6-4.8 6.6-14.8 0-1.3-.1-2.3-.4-3.5z"/>
+          </svg>
+          <strong style="font-size:14px; color:#0a2540;">4,9</strong>
+          <span style="color:#fbbc04; letter-spacing:1px;">★★★★★</span>
+          <span style="font-size:12px; color:#5f6368;">· 127 avaliações no Google</span>
+        </div>
+        <h3 style="margin:18px 0 0; font-family:'Fraunces', serif; font-style:italic; font-weight:700; font-size:clamp(28px, 4vw, 40px); color:#ffffff; text-shadow:0 4px 14px rgba(0,30,80,0.22);">
+          O que dizem os clientes
+        </h3>
+      </div>
+
+      <div class="reviews-grid">
+        <article class="review-card">
+          <div class="review-head">
+            <div class="review-avatar" style="background:linear-gradient(135deg,#EA4335,#FBBC04);">M</div>
+            <div>
+              <div class="review-name">Mariana Silva</div>
+              <div class="review-meta">Local Guide · há 2 semanas</div>
+            </div>
+          </div>
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">Aluguei a piscina de bolinhas para o aniversário do meu filho. Brinquedo limpíssimo, montagem rapidíssima e a equipe foi super atenciosa. As crianças amaram, recomendo demais!</p>
+        </article>
+
+        <article class="review-card">
+          <div class="review-head">
+            <div class="review-avatar" style="background:linear-gradient(135deg,#4285F4,#34A853);">R</div>
+            <div>
+              <div class="review-name">Rafael Mendes</div>
+              <div class="review-meta">há 1 mês</div>
+            </div>
+          </div>
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">O barco pirata foi o sucesso da festa! Entregaram no horário combinado, tudo higienizado e em ótimo estado. Atendimento no WhatsApp foi excelente, tirou todas as minhas dúvidas.</p>
+        </article>
+
+        <article class="review-card">
+          <div class="review-head">
+            <div class="review-avatar" style="background:linear-gradient(135deg,#34A853,#4285F4);">C</div>
+            <div>
+              <div class="review-name">Camila Rocha</div>
+              <div class="review-meta">Local Guide · há 3 semanas</div>
+            </div>
+          </div>
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">Já é a terceira vez que loco com a Mundo Feliz. Preço justo, brinquedos sempre novos e a retirada é tranquila. Virou a empresa oficial das festas lá de casa 🎉</p>
+        </article>
+      </div>
+    </section>
+
     <!-- piscina de bolinhas no rodapé — ocupa 100% da largura -->
     <img src="uploads/assets psicina de bolinha.png" alt=""
+      loading="lazy" decoding="async"
       style="position:relative; z-index:2; margin-top:auto; width:100%; height:auto; display:block;">
 
     <footer style="position:relative; z-index:3; width:100%; padding:24px; text-align:center; color:#0a2540; font-size:13px; background:rgba(255,255,255,0.0);">
