@@ -482,18 +482,18 @@
     }
 
     /* --- 2) CATÁLOGO: crianças PEQUENAS, UMA EM CADA CANTO ---
-       Antes elas tinham ~1200px de altura e ficavam sobrepostas
-       no centro. Agora ficam compactas, presas em cada borda,
-       sem se cruzarem no meio da tela. */
+       Ajustadas pra não colidirem no centro em telas estreitas.
+       Altura reduzida + posicionamento colado nos extremos + ajuste
+       de largura (a girl é naturalmente mais larga que o boy). */
     #catalogo .kid-boy {
-      height: 280px !important;
-      left: -30px !important;            /* canto esquerdo */
-      top: 30px !important;
+      height: 180px !important;
+      left: -25px !important;            /* canto esquerdo */
+      top: 40px !important;
     }
     #catalogo .kid-girl {
-      height: 280px !important;
-      right: -30px !important;           /* canto direito */
-      top: 30px !important;
+      height: 180px !important;
+      right: -35px !important;           /* canto direito, um pouco mais escondido pq ela é mais larga */
+      top: 40px !important;
     }
     /* desliga a flutuação senoidal pra evitar invasão lateral */
     #catalogo .kid-boy,
