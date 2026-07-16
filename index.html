@@ -96,10 +96,377 @@
   .review-text { color: #202124; font-size: 14px; line-height: 1.55; margin: 0; }
 
   /* ============================================================
+     CATÁLOGO — grid unificado, card clicável, CTA "ver mais"
+     e modal do brinquedo. Isolado por classe pra não vazar
+     em outras seções.
+     ============================================================ */
+  .toys-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 32px;
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+  .toy-card {
+    position: relative;
+    aspect-ratio: 4/5;
+    overflow: hidden;
+    border-radius: 22px;
+    box-shadow: 0 18px 44px rgba(0,30,80,0.26);
+    transition: transform .35s ease, box-shadow .35s ease;
+    cursor: pointer;
+    border: 0;
+    padding: 0;
+    background: #0a2540;   /* fallback enquanto a imagem carrega */
+    display: block;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+  }
+  .toy-card:hover,
+  .toy-card:focus-visible {
+    transform: translateY(-6px);
+    box-shadow: 0 26px 58px rgba(0,30,80,0.34);
+    outline: none;
+  }
+  .toy-card__img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+  }
+  .toy-card__fade {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: 62%;
+    background: linear-gradient(180deg, rgba(8,16,30,0) 0%, rgba(8,16,30,0.55) 55%, rgba(8,16,30,0.88) 100%);
+    pointer-events: none;
+  }
+  .toy-card__foot {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    padding: 20px 20px 18px;
+    display: flex; flex-direction: column;
+    align-items: stretch; justify-content: flex-end;
+    gap: 14px;
+  }
+  .toy-card__name {
+    margin: 0;
+    font-family: 'Fraunces', serif;
+    font-weight: 600; font-size: 22px; line-height: 1.15;
+    color: #ffffff;
+  }
+  .toy-card__actions {
+    display: flex; gap: 8px;
+  }
+  .toy-card__btn {
+    flex: 1;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600; font-size: 13px;
+    letter-spacing: 0.02em;
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 0;
+    cursor: pointer;
+    transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+    white-space: nowrap;
+  }
+  .toy-card__btn--ghost {
+    background: rgba(255,255,255,0.18);
+    backdrop-filter: blur(4px);
+    color: #ffffff;
+    border: 1px solid rgba(255,255,255,0.35);
+  }
+  .toy-card__btn--ghost:hover { background: rgba(255,255,255,0.28); }
+  .toy-card__btn--rent {
+    background: #25D366;
+    color: #ffffff;
+    box-shadow: 0 8px 18px rgba(37,211,102,0.35);
+  }
+  .toy-card__btn--rent:hover {
+    background: #1fbd5a;
+    transform: translateY(-1px);
+    box-shadow: 0 12px 22px rgba(37,211,102,0.45);
+  }
+
+  /* Bloco de brinquedos "extras" — escondido até clicar em Ver catálogo completo.
+     Usamos max-height + opacity pra animação suave. */
+  .toys-extra {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height .55s ease, opacity .45s ease, margin-top .45s ease;
+    margin-top: 0;
+  }
+  .toys-extra.is-open {
+    max-height: 6000px;   /* alto o bastante pra caber os 7 cards em qualquer breakpoint */
+    opacity: 1;
+    margin-top: 32px;
+  }
+
+  /* CTA elegante "Ver catálogo completo" */
+  .catalog-cta-wrap {
+    display: flex; justify-content: center;
+    margin-top: 48px;
+  }
+  .catalog-cta-more {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: #ffffff;
+    color: #0a2540;
+    border: 0;
+    padding: 18px 34px;
+    border-radius: 999px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600; font-size: 16px;
+    letter-spacing: 0.02em;
+    box-shadow: 0 18px 40px rgba(0,30,80,0.22);
+    cursor: pointer;
+    transition: transform .25s ease, box-shadow .25s ease, background .25s ease;
+  }
+  .catalog-cta-more:hover,
+  .catalog-cta-more:focus-visible {
+    transform: translateY(-3px);
+    box-shadow: 0 24px 52px rgba(0,30,80,0.30);
+    outline: none;
+  }
+  .catalog-cta-more .chev {
+    display: inline-block;
+    transition: transform .35s ease;
+    font-size: 18px; line-height: 1;
+  }
+  .catalog-cta-more.is-open .chev { transform: rotate(180deg); }
+
+  /* ============================================================
+     MODAL DO BRINQUEDO — estilo galeria (3 colunas no desktop)
+     [thumbs vertical] | [foto principal] | [conteúdo]
+     ============================================================ */
+  .toy-modal {
+    position: fixed; inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .toy-modal.is-open { display: flex; }
+  .toy-modal__backdrop {
+    position: absolute; inset: 0;
+    background: rgba(6, 14, 32, 0.72);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  .toy-modal__card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1180px;
+    min-height: 620px;              /* garante altura confortável mesmo se o conteúdo for curto */
+    max-height: calc(100vh - 32px); /* usa mais da tela verticalmente */
+    background: #ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 40px 90px rgba(0,20,60,0.45);
+    display: grid;
+    /* sem miniaturas por padrão: só stage + body */
+    grid-template-columns: 1.35fr 1fr;
+    animation: toyModalIn .3s ease-out;
+  }
+  /* Quando há mais de 1 imagem, mostra a coluna de miniaturas à esquerda */
+  .toy-modal__card.has-thumbs {
+    grid-template-columns: 92px 1.35fr 1fr;
+  }
+  @keyframes toyModalIn {
+    from { opacity: 0; transform: translateY(14px) scale(.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* --- coluna 1: miniaturas verticais --- */
+  .toy-modal__thumbs {
+    display: none;   /* escondida por padrão; card.has-thumbs mostra */
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px 8px 20px 16px;
+    overflow-y: auto;
+    background: #ffffff;
+    border-right: 1px solid #f0f2f5;
+  }
+  .toy-modal__card.has-thumbs .toy-modal__thumbs { display: flex; }
+  .toy-modal__thumb {
+    flex: none;
+    width: 64px; height: 64px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #e6e8ec;
+    padding: 0; cursor: pointer;
+    background: #eee;
+    transition: border-color .2s ease, transform .2s ease;
+  }
+  .toy-modal__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .toy-modal__thumb.is-active { border-color: #2f76ff; }
+  .toy-modal__thumb:hover { transform: translateY(-1px); }
+
+  /* --- coluna 2: foto principal grande --- */
+  .toy-modal__stage {
+    position: relative;
+    background: #f6f7f9;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 520px;
+    padding: 24px;
+  }
+  .toy-modal__main-img {
+    max-width: 100%;
+    max-height: 100%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+    display: block;
+  }
+
+  /* --- coluna 3: conteúdo --- */
+  .toy-modal__body {
+    padding: 36px 34px 32px;
+    display: flex; flex-direction: column;
+    gap: 14px;
+    overflow-y: auto;
+    background: #ffffff;
+    border-left: 1px solid #f0f2f5;
+  }
+  .toy-modal__eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px; font-weight: 600;
+    color: #5f6368;
+  }
+  .toy-modal__eyebrow strong { color: #25D366; }
+  .toy-modal__title {
+    margin: 0;
+    font-family: 'Fraunces', serif;
+    font-weight: 700; font-size: 30px; line-height: 1.15;
+    color: #0a2540;
+  }
+  .toy-modal__desc {
+    margin: 6px 0 4px;
+    color: #405066; font-size: 15px; line-height: 1.6;
+  }
+  /* Badges de confiança (Entrega inclusa, Higienizado, etc.) */
+  .toy-modal__badges {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin: 2px 0 4px;
+  }
+  .toy-modal__badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: #eaf6ee;
+    color: #1a7a3d;
+    letter-spacing: 0.02em;
+  }
+  /* Lista "o que está incluso" */
+  .toy-modal__list-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px; font-weight: 700;
+    color: #0a2540;
+    margin: 6px 0 0;
+  }
+  .toy-modal__list {
+    margin: 0; padding: 0; list-style: none;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .toy-modal__list li {
+    position: relative;
+    padding-left: 22px;
+    font-size: 14px; color: #405066; line-height: 1.5;
+  }
+  .toy-modal__list li::before {
+    content: "✓";
+    position: absolute; left: 0; top: 0;
+    color: #25D366; font-weight: 700;
+  }
+  .toy-modal__cta {
+    margin-top: auto;
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 12px;
+    background: #25D366;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 16px 24px;
+    border-radius: 999px;
+    font-weight: 700; font-size: 16px;
+    box-shadow: 0 14px 30px rgba(37,211,102,0.38);
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .toy-modal__cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px rgba(37,211,102,0.50);
+  }
+  .toy-modal__close {
+    position: absolute; top: 14px; right: 14px;
+    z-index: 3;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 0;
+    background: rgba(255,255,255,0.95);
+    color: #0a2540;
+    font-size: 22px; line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(0,20,60,0.25);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform .2s ease;
+  }
+  .toy-modal__close:hover { transform: scale(1.08); }
+
+  /* Trava do scroll do body quando o modal está aberto */
+  body.toy-modal-open { overflow: hidden; }
+
+  /* ============================================================
      ============== AJUSTES SOMENTE MOBILE ======================
      Tudo abaixo afeta APENAS telas <= 768px (mobile).
      Nada do desktop é alterado.
      ============================================================ */
+  @media (max-width: 768px) {
+
+    /* --- CATÁLOGO mobile: grid em 1 coluna, gap menor --- */
+    .toys-grid { grid-template-columns: 1fr; gap: 20px; }
+    .catalog-cta-more { padding: 16px 26px; font-size: 15px; }
+
+    /* --- MODAL mobile: vira coluna, tela cheia confortável --- */
+    .toy-modal { padding: 0; }
+    .toy-modal__card,
+    .toy-modal__card.has-thumbs {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto 1fr;
+      max-width: 100%;
+      width: 100%;
+      max-height: 100vh;
+      height: 100vh;
+      border-radius: 0;
+    }
+    .toy-modal__stage {
+      min-height: 240px;
+      max-height: 40vh;
+      padding: 0;
+      order: 1;
+    }
+    .toy-modal__main-img {
+      border-radius: 0;
+      height: 100%;
+    }
+    /* Miniaturas: no mobile viram uma faixa horizontal logo abaixo da foto */
+    .toy-modal__card.has-thumbs .toy-modal__thumbs {
+      flex-direction: row;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 10px 12px;
+      border-right: 0;
+      border-bottom: 1px solid #f0f2f5;
+      order: 2;
+    }
+    .toy-modal__body {
+      padding: 20px 20px 28px;
+      border-left: 0;
+      order: 3;
+    }
+    .toy-modal__title { font-size: 24px; }
+    .toy-modal__cta { width: 100%; }
+  }
+
   @media (max-width: 768px) {
 
     /* --- 1) HERO PRINCIPAL: globo BEM maior e CENTRALIZADO ---
@@ -199,19 +566,110 @@
         </p>
       </div>
 
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:32px; max-width:1080px; margin:0 auto;">
+      <!-- GRID PRINCIPAL (3 brinquedos em destaque) -->
+      <div class="toys-grid" id="toysGridMain">
         <sc-for list="{{ toys }}" as="t" hint-placeholder-count="3">
-          <article style="position:relative; aspect-ratio:4/5; overflow:hidden; border-radius:22px; box-shadow:0 18px 44px rgba(0,30,80,0.26); transition:transform .35s ease, box-shadow .35s ease;"
-            style-hover="transform: translateY(-6px); box-shadow: 0 26px 58px rgba(0,30,80,0.34);">
-            <img src="{{ t.img }}" alt="{{ t.name }}" loading="lazy" decoding="async" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;">
-            <!-- fade preto p/ legibilidade do texto -->
-            <div style="position:absolute; left:0; right:0; bottom:0; height:62%; background:linear-gradient(180deg, rgba(8,16,30,0) 0%, rgba(8,16,30,0.55) 55%, rgba(8,16,30,0.88) 100%);"></div>
-            <div style="position:absolute; left:0; right:0; bottom:0; padding:24px; display:flex; align-items:flex-end; justify-content:space-between; gap:14px;">
-              <h3 style="margin:0; font-family:'Fraunces', serif; font-weight:600; font-size:24px; line-height:1.15; color:#ffffff;">{{ t.name }}</h3>
-              <span style="flex:none; font-family:'Inter',sans-serif; font-weight:700; font-size:16px; color:#ffffff; background:rgba(255,255,255,0.18); backdrop-filter:blur(4px); padding:7px 12px; border-radius:999px; white-space:nowrap;">{{ t.price }}</span>
+          <article class="toy-card"
+            data-toy-name="{{ t.name }}"
+            data-toy-desc="{{ t.desc }}"
+            data-toy-imgs="{{ t.imgs }}"
+            role="button" tabindex="0"
+            aria-label="Ver detalhes de {{ t.name }}">
+            <img class="toy-card__img" src="{{ t.img }}" alt="{{ t.name }}" loading="lazy" decoding="async">
+            <div class="toy-card__fade"></div>
+            <div class="toy-card__foot">
+              <h3 class="toy-card__name">{{ t.name }}</h3>
+              <div class="toy-card__actions">
+                <button type="button" class="toy-card__btn toy-card__btn--ghost" data-toy-more="1">Ver mais</button>
+                <button type="button" class="toy-card__btn toy-card__btn--rent" data-toy-rent="1">Alugar</button>
+              </div>
             </div>
           </article>
         </sc-for>
+      </div>
+
+      <!-- BOTÃO "VER CATÁLOGO COMPLETO" — revela os brinquedos extras -->
+      <div class="catalog-cta-wrap">
+        <button type="button" class="catalog-cta-more" id="catalogToggle"
+          aria-controls="toysGridExtra" aria-expanded="false">
+          <span class="catalog-cta-label">Ver catálogo completo</span>
+          <span class="chev" aria-hidden="true">▾</span>
+        </button>
+      </div>
+
+      <!-- GRID EXTRA (7 brinquedos) — começa fechado, abre no clique.
+           Compartilha .toys-grid pra manter o mesmo layout do topo. -->
+      <div class="toys-extra" id="toysGridExtra" aria-hidden="true">
+        <div class="toys-grid">
+          <sc-for list="{{ toysExtra }}" as="t" hint-placeholder-count="7">
+            <article class="toy-card"
+              data-toy-name="{{ t.name }}"
+              data-toy-desc="{{ t.desc }}"
+              data-toy-imgs="{{ t.imgs }}"
+              role="button" tabindex="0"
+              aria-label="Ver detalhes de {{ t.name }}">
+              <img class="toy-card__img" src="{{ t.img }}" alt="{{ t.name }}" loading="lazy" decoding="async">
+              <div class="toy-card__fade"></div>
+              <div class="toy-card__foot">
+                <h3 class="toy-card__name">{{ t.name }}</h3>
+                <div class="toy-card__actions">
+                  <button type="button" class="toy-card__btn toy-card__btn--ghost" data-toy-more="1">Ver mais</button>
+                  <button type="button" class="toy-card__btn toy-card__btn--rent" data-toy-rent="1">Alugar</button>
+                </div>
+              </div>
+            </article>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================================
+         MODAL DO BRINQUEDO — reaproveitado por qualquer card.
+         Preparado pra múltiplas imagens (miniaturas embaixo).
+         Enquanto só houver 1 imagem por brinquedo, a faixa de
+         miniaturas fica escondida automaticamente (has-many).
+         ========================================================== -->
+    <div class="toy-modal" id="toyModal" role="dialog" aria-modal="true" aria-labelledby="toyModalTitle" aria-hidden="true">
+      <div class="toy-modal__backdrop" data-modal-close></div>
+      <div class="toy-modal__card" id="toyModalCard">
+        <button type="button" class="toy-modal__close" data-modal-close aria-label="Fechar">×</button>
+
+        <!-- coluna 1: miniaturas (aparecem se houver >1 imagem via .has-thumbs no card) -->
+        <div class="toy-modal__thumbs" id="toyModalThumbs"></div>
+
+        <!-- coluna 2: foto principal -->
+        <div class="toy-modal__stage">
+          <img class="toy-modal__main-img" id="toyModalMainImg" src="" alt="">
+        </div>
+
+        <!-- coluna 3: conteúdo -->
+        <div class="toy-modal__body">
+          <span class="toy-modal__eyebrow">Locação · <strong>Mundo Feliz</strong></span>
+          <h3 class="toy-modal__title" id="toyModalTitle"></h3>
+
+          <div class="toy-modal__badges">
+            <span class="toy-modal__badge">✓ Entrega inclusa</span>
+            <span class="toy-modal__badge">✓ Montagem gratuita</span>
+            <span class="toy-modal__badge">✓ Higienizado</span>
+          </div>
+
+          <p class="toy-modal__desc" id="toyModalDesc"></p>
+
+          <p class="toy-modal__list-title">O que está incluso:</p>
+          <ul class="toy-modal__list">
+            <li>Entrega no endereço no dia marcado</li>
+            <li>Montagem e desmontagem por equipe própria</li>
+            <li>Higienização completa antes do evento</li>
+            <li>Suporte via WhatsApp durante toda a locação</li>
+          </ul>
+
+          <a class="toy-modal__cta" id="toyModalCta" href="#" target="_blank" rel="noopener">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zM18.062 14.382c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+            </svg>
+            Alugar este brinquedo
+          </a>
+        </div>
       </div>
     </div>
 
@@ -238,7 +696,7 @@
       </p>
 
       <!-- CTA WhatsApp -->
-      <a href="https://wa.me/5511999999999?text=Ol%C3%A1!%20Quero%20um%20or%C3%A7amento%20para%20locar%20brinquedos%20com%20a%20Mundo%20Feliz."
+      <a href="https://wa.me/5531992567510?text=Ol%C3%A1!%20Quero%20um%20or%C3%A7amento%20para%20locar%20brinquedos%20com%20a%20Mundo%20Feliz."
         target="_blank" rel="noopener"
         style="display:inline-flex; align-items:center; gap:14px; background:#25D366; color:#ffffff; text-decoration:none; padding:22px 40px; border-radius:999px; font-weight:700; font-size:22px; box-shadow:0 20px 50px rgba(37,211,102,0.45); transition:transform .25s ease, box-shadow .25s ease;"
         style-hover="transform: translateY(-3px); box-shadow: 0 28px 60px rgba(37,211,102,0.55);">
@@ -249,7 +707,7 @@
       </a>
 
       <p style="margin-top:24px; color:#ffffff; font-size:14px; opacity:0.85;">
-        ou ligue: <strong>(11) 99999-9999</strong>
+        ou ligue: <strong>(31) 99256-7510</strong>
       </p>
     </div>
 
@@ -333,13 +791,55 @@ class Component extends DCLogic {
     // Em modo standalone, as imagens vêm de window.__resources (blob URLs).
     const R = (typeof window !== 'undefined' && window.__resources) || {};
     return {
+      // Imagens disponíveis hoje (3). Enquanto não subimos as reais dos brinquedos
+      // extras, reaproveitamos essas três em rodízio como placeholder visual.
+      // O campo `imgs` é uma lista pipe-separada — no dia em que existir mais de
+      // uma foto por brinquedo, o modal já mostra automaticamente as miniaturas.
       toys: [
-        { name: 'Piscina de Bolinhas', desc: 'Mergulho de diversão colorido para os pequenos.', price: 'R$ 250/dia',
-          img: R.toy1 || 'uploads/toy1.png' },
-        { name: 'Barco Pirata', desc: 'Tobogã inflável gigante em forma de navio pirata.', price: 'R$ 480/dia',
-          img: R.toy2 || 'uploads/toy2.png' },
-        { name: 'Tenda de Bolinhas', desc: 'Tenda inflável espaçosa, perfeita para festas em casa.', price: 'R$ 380/dia',
-          img: R.toy3 || 'uploads/toy3.png' }
+        { name: 'Piscina de Bolinhas',
+          desc: 'Mergulho colorido de diversão pros pequenos. Higienizada, com bolinhas novas e proteção em todas as bordas — clássico que nunca falha em festa infantil.',
+          img: R.toy1 || 'uploads/toy1.png',
+          imgs: (R.toy1 || 'uploads/toy1.png') },
+        { name: 'Barco Pirata',
+          desc: 'Tobogã inflável gigante em forma de navio pirata. Escalada, escorrega e muita aventura — o brinquedo que vira a atração principal da festa.',
+          img: R.toy2 || 'uploads/toy2.png',
+          imgs: (R.toy2 || 'uploads/toy2.png') },
+        { name: 'Tenda de Bolinhas',
+          desc: 'Tenda inflável espaçosa, perfeita pra festas em casa. Ideal pra crianças menores brincarem com segurança e conforto num espaço só delas.',
+          img: R.toy3 || 'uploads/toy3.png',
+          imgs: (R.toy3 || 'uploads/toy3.png') }
+      ],
+      // Brinquedos extras — revelados no clique de "Ver catálogo completo".
+      // Total do catálogo: 3 principais + 7 extras = 10 cards.
+      toysExtra: [
+        { name: 'Castelo Inflável',
+          desc: 'Castelo inflável colorido com área ampla pra pular. Um dos brinquedos mais pedidos pra festas de aniversário — diversão garantida do começo ao fim.',
+          img: R.toy1 || 'uploads/toy1.png',
+          imgs: (R.toy1 || 'uploads/toy1.png') },
+        { name: 'Tobogã Gigante',
+          desc: 'Escorregador inflável enorme, com escalada e descida em alta velocidade. Traz aquela sensação de parque aquático direto pro quintal.',
+          img: R.toy2 || 'uploads/toy2.png',
+          imgs: (R.toy2 || 'uploads/toy2.png') },
+        { name: 'Cama Elástica',
+          desc: 'Cama elástica com tela de proteção 360°. Segura, resistente e com aquela alegria clássica de pular sem parar. Acompanha equipe pra montagem.',
+          img: R.toy3 || 'uploads/toy3.png',
+          imgs: (R.toy3 || 'uploads/toy3.png') },
+        { name: 'Escorregador Aquático',
+          desc: 'Escorregador inflável com jato de água — perfeito pra festas de verão. Vem com bomba e todo o kit de instalação pronto pra usar.',
+          img: R.toy1 || 'uploads/toy1.png',
+          imgs: (R.toy1 || 'uploads/toy1.png') },
+        { name: 'Touro Mecânico Kids',
+          desc: 'Versão infantil do touro mecânico, com velocidade controlada e almofadas de proteção. Faz sucesso absoluto com a criançada mais aventureira.',
+          img: R.toy2 || 'uploads/toy2.png',
+          imgs: (R.toy2 || 'uploads/toy2.png') },
+        { name: 'Circuito de Obstáculos',
+          desc: 'Estrutura inflável longa com túneis, escaladas e obstáculos. Ótimo pra grupos maiores — divide as crianças em times e vira brincadeira coletiva.',
+          img: R.toy3 || 'uploads/toy3.png',
+          imgs: (R.toy3 || 'uploads/toy3.png') },
+        { name: 'Kid Play com Escorregador',
+          desc: 'Playground inflável compacto com escorregador e área de pulo. Perfeito pra festas com espaço mais reduzido, sem abrir mão da diversão.',
+          img: R.toy1 || 'uploads/toy1.png',
+          imgs: (R.toy1 || 'uploads/toy1.png') }
       ]
     };
   }
@@ -425,6 +925,140 @@ class Component extends DCLogic {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
     };
+
+    // ============================================================
+    // CATÁLOGO — toggle "Ver catálogo completo" + modal do brinquedo
+    // ------------------------------------------------------------
+    // - Cada card (.toy-card) carrega os dados nos data-attrs
+    //   (data-toy-name, data-toy-desc, data-toy-imgs).
+    // - data-toy-imgs é pipe-separado ("url1|url2|..."). Enquanto
+    //   houver só 1 imagem, a faixa de miniaturas fica escondida
+    //   (classe .has-many controla). No dia em que subir mais
+    //   fotos por brinquedo, é só passar mais URLs separadas por |.
+    // ============================================================
+    const WHATSAPP_NUMBER = '5531992567510'; // mesmo número da seção de contato
+
+    // -- 1) Toggle do bloco extra ---------------------------------
+    const catalogToggle = document.getElementById('catalogToggle');
+    const toysExtraEl   = document.getElementById('toysGridExtra');
+    if (catalogToggle && toysExtraEl) {
+      const labelEl = catalogToggle.querySelector('.catalog-cta-label');
+      catalogToggle.addEventListener('click', () => {
+        const isOpen = toysExtraEl.classList.toggle('is-open');
+        catalogToggle.classList.toggle('is-open', isOpen);
+        catalogToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        toysExtraEl.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+        if (labelEl) labelEl.textContent = isOpen ? 'Ver menos' : 'Ver catálogo completo';
+      });
+    }
+
+    // -- 2) Modal do brinquedo ------------------------------------
+    const modal        = document.getElementById('toyModal');
+    const modalCardEl  = document.getElementById('toyModalCard');
+    const modalTitle   = document.getElementById('toyModalTitle');
+    const modalDesc    = document.getElementById('toyModalDesc');
+    const modalMainImg = document.getElementById('toyModalMainImg');
+    const modalThumbs  = document.getElementById('toyModalThumbs');
+    const modalCta     = document.getElementById('toyModalCta');
+
+    const buildWhatsappHref = (toyName) => {
+      const msg = `Olá! Gostaria de mais informações sobre o aluguel do brinquedo "${toyName}". Poderia me ajudar?`;
+      return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+    };
+
+    // Ler dados de um card (usado pelos dois fluxos: Alugar e Ver mais)
+    const readToy = (cardEl) => ({
+      name: cardEl.dataset.toyName || '',
+      desc: cardEl.dataset.toyDesc || '',
+      imgs: cardEl.dataset.toyImgs || ''
+    });
+
+    const openModal = (toy) => {
+      if (!modal) return;
+      modalTitle.textContent = toy.name;
+      modalDesc.textContent  = toy.desc;
+
+      // Galeria: divide o pipe-separado em array.
+      const imgs = (toy.imgs || '').split('|').map(s => s.trim()).filter(Boolean);
+      const first = imgs[0] || '';
+      modalMainImg.src = first;
+      modalMainImg.alt = toy.name;
+
+      // Miniaturas SEMPRE visíveis. Enquanto o brinquedo tiver só 1 foto,
+      // a gente repete essa mesma imagem pra mostrar o affordance da galeria.
+      // Quando você subir fotos reais (pipe-separadas em `imgs`), passa a
+      // mostrar cada uma automaticamente.
+      const thumbList = imgs.length > 1 ? imgs : (first ? [first, first, first, first] : []);
+      modalThumbs.innerHTML = '';
+      if (thumbList.length > 0) {
+        modalCardEl.classList.add('has-thumbs');
+        thumbList.forEach((url, i) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'toy-modal__thumb' + (i === 0 ? ' is-active' : '');
+          btn.innerHTML = `<img src="${url}" alt="">`;
+          btn.addEventListener('click', () => {
+            modalMainImg.src = url;
+            modalThumbs.querySelectorAll('.toy-modal__thumb').forEach(t => t.classList.remove('is-active'));
+            btn.classList.add('is-active');
+          });
+          modalThumbs.appendChild(btn);
+        });
+      } else {
+        modalCardEl.classList.remove('has-thumbs');
+      }
+
+      modalCta.href = buildWhatsappHref(toy.name);
+
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('toy-modal-open');
+    };
+
+    const closeModal = () => {
+      if (!modal) return;
+      modal.classList.remove('is-open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('toy-modal-open');
+    };
+
+    // Dispara o WhatsApp direto (usado pelo botão "Alugar" no card)
+    const rentToy = (cardEl) => {
+      const toy = readToy(cardEl);
+      window.open(buildWhatsappHref(toy.name), '_blank', 'noopener');
+    };
+
+    // Delegação: distingue os dois botões do card + clique no corpo do card.
+    // Ordem importa: checa "Alugar" primeiro pra não abrir o modal por engano.
+    document.addEventListener('click', (ev) => {
+      // Fechar modal
+      if (ev.target.closest('[data-modal-close]')) { closeModal(); return; }
+
+      // Botão "Alugar" dentro do card → WhatsApp direto, sem modal
+      const rentBtn = ev.target.closest('[data-toy-rent]');
+      if (rentBtn) {
+        ev.stopPropagation();
+        const card = rentBtn.closest('.toy-card');
+        if (card) rentToy(card);
+        return;
+      }
+
+      // Botão "Ver mais" ou clique no corpo do card → modal
+      const card = ev.target.closest('.toy-card');
+      if (card) openModal(readToy(card));
+    });
+
+    // Acessibilidade: Enter/Espaço no card (role=button) abre o modal.
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape' && modal && modal.classList.contains('is-open')) {
+        closeModal();
+        return;
+      }
+      if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.classList && ev.target.classList.contains('toy-card')) {
+        ev.preventDefault();
+        openModal(readToy(ev.target));
+      }
+    });
   }
 
   componentWillUnmount() {
