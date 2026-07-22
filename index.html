@@ -58,6 +58,16 @@
 
   /* ============================================================
      REVIEWS (Google Maps style) — desktop default
+     ------------------------------------------------------------
+     Classes usam padrão BEM (reviews__grid, review-card__head,
+     avatar--A, etc). O reviews-loader.js espera EXATAMENTE
+     estes nomes — não renomear sem atualizar o JS também.
+
+     Fluxo: HTML renderiza os 3 cards fake abaixo → loader chama
+     /api/google-places → se retornar OK, sobrescreve innerHTML
+     de .reviews__grid com cards reais + atualiza score/total +
+     preenche href dos [data-google-link] com a URL real do Maps.
+     Se a API falhar, os cards fake permanecem visíveis.
      ============================================================ */
   .reviews-section {
     position: relative;
@@ -67,7 +77,7 @@
     margin: 80px auto 0;
     padding: 0 24px;
   }
-  .reviews-grid {
+  .reviews__grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
@@ -82,18 +92,68 @@
     flex-direction: column;
     gap: 10px;
   }
-  .review-head { display: flex; align-items: center; gap: 12px; }
-  .review-avatar {
+  .review-card__head { display: flex; align-items: center; gap: 12px; }
+  .review-card__avatar {
     width: 44px; height: 44px; border-radius: 50%;
-    background: linear-gradient(135deg, #4285F4, #34A853);
     color: #fff; font-weight: 700; font-size: 18px;
     display: flex; align-items: center; justify-content: center;
     flex: none;
+    overflow: hidden; /* clip da foto do autor quando o Google retorna */
+    background: linear-gradient(135deg, #4285F4, #34A853); /* fallback default */
   }
-  .review-name { font-weight: 600; color: #0a2540; font-size: 15px; line-height: 1.2; }
-  .review-meta { font-size: 12px; color: #5f6368; margin-top: 2px; }
-  .review-stars { color: #fbbc04; font-size: 16px; letter-spacing: 1px; }
-  .review-text { color: #202124; font-size: 14px; line-height: 1.55; margin: 0; }
+  /* Variantes de cor do avatar (loader escolhe por hash do nome do autor).
+     Cores baseadas na paleta Google — mantém coerência com a estética
+     "Google Maps" da seção sem repetir a mesma cor em todos os cards. */
+  .review-card__avatar.avatar--A { background: linear-gradient(135deg, #EA4335, #FBBC04); }
+  .review-card__avatar.avatar--B { background: linear-gradient(135deg, #4285F4, #34A853); }
+  .review-card__avatar.avatar--C { background: linear-gradient(135deg, #34A853, #4285F4); }
+  .review-card__avatar.avatar--D { background: linear-gradient(135deg, #FBBC04, #EA4335); }
+  .review-card__avatar.avatar--E { background: linear-gradient(135deg, #4285F4, #EA4335); }
+  .review-card__avatar.avatar--F { background: linear-gradient(135deg, #34A853, #FBBC04); }
+
+  .review-card__name { font-weight: 600; color: #0a2540; font-size: 15px; line-height: 1.2; }
+  .review-card__name--link { color: #0a2540; text-decoration: none; }
+  .review-card__name--link:hover { text-decoration: underline; }
+  .review-card__meta { font-size: 12px; color: #5f6368; margin-top: 2px; }
+  .review-card__stars { color: #fbbc04; font-size: 16px; letter-spacing: 1px; }
+  .review-card__text { color: #202124; font-size: 14px; line-height: 1.55; margin: 0; }
+
+  /* Pill "via Google" no rodapé do card — assinatura visual de origem */
+  .review-card__source {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; color: #5f6368;
+    margin-top: 4px;
+  }
+  .review-card__source--link { text-decoration: none; }
+  .review-card__source--link:hover { text-decoration: underline; }
+
+  /* Mini "G" colorido do Google — usado no pill "via Google" dos cards.
+     SVG inline como background pra não depender de request de rede. */
+  .google-g {
+    display: inline-block; width: 12px; height: 12px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path fill='%23FFC107' d='M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z'/><path fill='%23FF3D00' d='M6.3 14.7l6.6 4.8C14.7 16 19 13 24 13c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z'/><path fill='%234CAF50' d='M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35 26.7 36 24 36c-5.3 0-9.7-3.1-11.3-7.5l-6.5 5C9.5 39.6 16.2 44 24 44z'/><path fill='%231976D2' d='M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.1 5.6l6.2 5.2c-.4.4 6.6-4.8 6.6-14.8 0-1.3-.1-2.3-.4-3.5z'/></svg>");
+    background-size: contain; background-repeat: no-repeat;
+    flex: none;
+  }
+
+  /* CTA "Ver todas no Google" — o loader preenche o href com a URL real
+     do perfil do negócio no Maps via [data-google-link]. */
+  .reviews__cta-google {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 14px;
+    padding: 10px 18px;
+    background: #fff;
+    border-radius: 999px;
+    box-shadow: 0 8px 20px rgba(0,30,80,0.14);
+    color: #0a2540;
+    font-size: 13px; font-weight: 600;
+    text-decoration: none;
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .reviews__cta-google:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 26px rgba(0,30,80,0.20);
+  }
 
   /* ============================================================
      CATÁLOGO — grid unificado, card clicável, CTA "ver mais"
@@ -662,7 +722,7 @@
     #catalogo { padding-top: 80px; }
 
     /* --- 3) REVIEWS: cards em coluna única no mobile -------- */
-    .reviews-grid { grid-template-columns: 1fr; gap: 14px; }
+    .reviews__grid { grid-template-columns: 1fr; gap: 14px; }
     .reviews-section { margin-top: 56px; }
 
     /* --- 4) BARRA DE PESQUISA no mobile ---
@@ -927,8 +987,11 @@
     </div>
 
     <!-- ============================================== -->
-    <!-- 3.1 AVALIAÇÕES (estilo Google Maps - fake)     -->
-    <!-- ============================================== -->
+    <!-- 3.1 AVALIAÇÕES (Google Maps — real via API + fallback fake)   -->
+    <!-- ============================================================= -->
+    <!-- Os 3 cards abaixo + score/total são FALLBACK. Se /api/google-  -->
+    <!-- places responder OK, o reviews-loader.js sobrescreve tudo com  -->
+    <!-- dados reais. Classes seguem BEM porque o loader depende delas. -->
     <section class="reviews-section" aria-label="Avaliações de clientes">
       <div style="text-align:center; margin-bottom:28px;">
         <div style="display:inline-flex; align-items:center; gap:10px; background:#fff; padding:10px 18px; border-radius:999px; box-shadow:0 10px 24px rgba(0,30,80,0.16);">
@@ -939,51 +1002,68 @@
             <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35 26.7 36 24 36c-5.3 0-9.7-3.1-11.3-7.5l-6.5 5C9.5 39.6 16.2 44 24 44z"/>
             <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.1 5.6l6.2 5.2c-.4.4 6.6-4.8 6.6-14.8 0-1.3-.1-2.3-.4-3.5z"/>
           </svg>
-          <strong style="font-size:14px; color:#0a2540;">4,9</strong>
-          <span style="color:#fbbc04; letter-spacing:1px;">★★★★★</span>
-          <span style="font-size:12px; color:#5f6368;">· 127 avaliações no Google</span>
+          <!-- Loader atualiza os spans abaixo com dados reais do Google -->
+          <strong class="reviews__summary-score" style="font-size:14px; color:#0a2540;">4,9</strong>
+          <span class="reviews__summary-stars" style="color:#fbbc04; letter-spacing:1px;">★★★★★</span>
+          <span class="reviews__summary-text" style="font-size:12px; color:#5f6368;">· 127 avaliações no Google</span>
         </div>
         <h3 style="margin:18px 0 0; font-family:'Fraunces', serif; font-style:italic; font-weight:700; font-size:clamp(28px, 4vw, 40px); color:#ffffff; text-shadow:0 4px 14px rgba(0,30,80,0.22);">
           O que dizem os clientes
         </h3>
       </div>
 
-      <div class="reviews-grid">
+      <div class="reviews__grid">
         <article class="review-card">
-          <div class="review-head">
-            <div class="review-avatar" style="background:linear-gradient(135deg,#EA4335,#FBBC04);">M</div>
+          <div class="review-card__head">
+            <div class="review-card__avatar avatar--A" aria-hidden="true">M</div>
             <div>
-              <div class="review-name">Mariana Silva</div>
-              <div class="review-meta">Local Guide · há 2 semanas</div>
+              <div class="review-card__name">Mariana Silva</div>
+              <div class="review-card__meta">Local Guide · há 2 semanas</div>
             </div>
           </div>
-          <div class="review-stars">★★★★★</div>
-          <p class="review-text">Aluguei a piscina de bolinhas para o aniversário do meu filho. Brinquedo limpíssimo, montagem rapidíssima e a equipe foi super atenciosa. As crianças amaram, recomendo demais!</p>
+          <div class="review-card__stars" aria-label="5 estrelas">★★★★★</div>
+          <p class="review-card__text">"Aluguei a piscina de bolinhas para o aniversário do meu filho. Brinquedo limpíssimo, montagem rapidíssima e a equipe foi super atenciosa. As crianças amaram, recomendo demais!"</p>
+          <span class="review-card__source"><span class="google-g" aria-hidden="true"></span> via Google</span>
         </article>
 
         <article class="review-card">
-          <div class="review-head">
-            <div class="review-avatar" style="background:linear-gradient(135deg,#4285F4,#34A853);">R</div>
+          <div class="review-card__head">
+            <div class="review-card__avatar avatar--B" aria-hidden="true">R</div>
             <div>
-              <div class="review-name">Rafael Mendes</div>
-              <div class="review-meta">há 1 mês</div>
+              <div class="review-card__name">Rafael Mendes</div>
+              <div class="review-card__meta">há 1 mês</div>
             </div>
           </div>
-          <div class="review-stars">★★★★★</div>
-          <p class="review-text">O barco pirata foi o sucesso da festa! Entregaram no horário combinado, tudo higienizado e em ótimo estado. Atendimento no WhatsApp foi excelente, tirou todas as minhas dúvidas.</p>
+          <div class="review-card__stars" aria-label="5 estrelas">★★★★★</div>
+          <p class="review-card__text">"O barco pirata foi o sucesso da festa! Entregaram no horário combinado, tudo higienizado e em ótimo estado. Atendimento no WhatsApp foi excelente, tirou todas as minhas dúvidas."</p>
+          <span class="review-card__source"><span class="google-g" aria-hidden="true"></span> via Google</span>
         </article>
 
         <article class="review-card">
-          <div class="review-head">
-            <div class="review-avatar" style="background:linear-gradient(135deg,#34A853,#4285F4);">C</div>
+          <div class="review-card__head">
+            <div class="review-card__avatar avatar--C" aria-hidden="true">C</div>
             <div>
-              <div class="review-name">Camila Rocha</div>
-              <div class="review-meta">Local Guide · há 3 semanas</div>
+              <div class="review-card__name">Camila Rocha</div>
+              <div class="review-card__meta">Local Guide · há 3 semanas</div>
             </div>
           </div>
-          <div class="review-stars">★★★★★</div>
-          <p class="review-text">Já é a terceira vez que loco com a Mundo Feliz. Preço justo, brinquedos sempre novos e a retirada é tranquila. Virou a empresa oficial das festas lá de casa 🎉</p>
+          <div class="review-card__stars" aria-label="5 estrelas">★★★★★</div>
+          <p class="review-card__text">"Já é a terceira vez que loco com a Mundo Feliz. Preço justo, brinquedos sempre novos e a retirada é tranquila. Virou a empresa oficial das festas lá de casa 🎉"</p>
+          <span class="review-card__source"><span class="google-g" aria-hidden="true"></span> via Google</span>
         </article>
+      </div>
+
+      <!-- CTA "Ver todas no Google": href preenchido pelo loader com a
+           URL real do perfil do negócio no Maps. Fica como "#" no HTML
+           pra não levar a lugar nenhum se o JS não rodar. -->
+      <div style="text-align:center;">
+        <a class="reviews__cta-google" href="#" data-google-link rel="noopener">
+          <span class="google-g" aria-hidden="true"></span>
+          Ver todas no Google
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M7 17L17 7M9 7h8v8"/>
+          </svg>
+        </a>
       </div>
     </section>
 
@@ -1437,5 +1517,10 @@ class Component extends DCLogic {
   }
 }
 </script>
+
+<!-- Carrega e injeta reviews reais do Google Places. Progressive
+     enhancement: se /api/google-places falhar, os cards fake acima
+     permanecem visíveis. defer = executa depois do parse do HTML. -->
+<script src="./reviews-loader.js" defer></script>
 </body>
 </html>
