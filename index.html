@@ -3,9 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="ext-resource-dependency" content="uploads/toy1.png" data-resource-id="toy1" />
-<meta name="ext-resource-dependency" content="uploads/toy2.png" data-resource-id="toy2" />
-<meta name="ext-resource-dependency" content="uploads/toy3.png" data-resource-id="toy3" />
+<meta name="ext-resource-dependency" content="uploads/tombo-legal.webp" data-resource-id="tomboLegal" />
+<meta name="ext-resource-dependency" content="uploads/toboga-premium.webp" data-resource-id="tobogaPremium" />
+<meta name="ext-resource-dependency" content="uploads/piscina-bolinhas.webp" data-resource-id="piscinaBolinhas" />
+<meta name="ext-resource-dependency" content="uploads/cama-elastica.webp" data-resource-id="camaElastica" />
+<meta name="ext-resource-dependency" content="uploads/mini-centopeia.webp" data-resource-id="miniCentopeia" />
+<meta name="ext-resource-dependency" content="uploads/touro-mecanico.webp" data-resource-id="touroMecanico" />
+<meta name="ext-resource-dependency" content="uploads/mini-toboga-tigrinho.webp" data-resource-id="miniTobogaTigrinho" />
+<meta name="ext-resource-dependency" content="uploads/toto.webp" data-resource-id="toto" />
+<meta name="ext-resource-dependency" content="uploads/ping-pong.webp" data-resource-id="pingPong" />
+<meta name="ext-resource-dependency" content="uploads/futebol-sabao.webp" data-resource-id="futebolSabao" />
+<meta name="ext-resource-dependency" content="uploads/algodao-doce.webp" data-resource-id="algodaoDoce" />
+<meta name="ext-resource-dependency" content="uploads/pipoqueira.webp" data-resource-id="pipoqueira" />
 <script src="./support.js"></script>
 </head>
 <body>
@@ -27,10 +36,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,800;1,9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <!-- ============================================================ -->
-<!-- PERFORMANCE: preload das imagens críticas do hero (above-fold) -->
+<!-- PERFORMANCE: preload APENAS do logo do hero (critical LCP).   -->
+<!-- As bolinhas decorativas de fundo NÃO precisam de preload —    -->
+<!-- carregam junto sem bloquear o render inicial.                 -->
 <!-- ============================================================ -->
 <link rel="preload" as="image" href="uploads/assets hero - globo e mundo feliz.png" fetchpriority="high">
-<link rel="preload" as="image" href="uploads/estilo (3).png">
 
 <style>
   html, body { margin: 0; padding: 0; }
@@ -57,7 +67,36 @@
   }
 
   /* ============================================================
+     PERFORMANCE: content-visibility pras seções abaixo da dobra.
+     ------------------------------------------------------------
+     Isso faz o navegador PULAR o render (layout + paint) dessas
+     seções até elas chegarem perto da viewport. Ganho de LCP e
+     TTI grande em páginas longas com muito conteúdo pesado.
+
+     contain-intrinsic-size = tamanho estimado enquanto não renderiza
+     (evita salto do scrollbar quando o browser resolve renderizar).
+     ============================================================ */
+  #catalogo { content-visibility: auto; contain-intrinsic-size: 1px 2400px; }
+  #contato  { content-visibility: auto; contain-intrinsic-size: 1px 1600px; }
+
+  /* Os cards do catálogo se beneficiam de contain: paint — isola o
+     paint layer de cada card pra não repintar toda a lista quando um
+     card individual muda (hover, foco). */
+  .toy-card { contain: paint; }
+</style>
+
+  /* ============================================================
      REVIEWS (Google Maps style) — desktop default
+     ------------------------------------------------------------
+     Classes usam padrão BEM (reviews__grid, review-card__head,
+     avatar--A, etc). O reviews-loader.js espera EXATAMENTE
+     estes nomes — não renomear sem atualizar o JS também.
+
+     Fluxo: HTML renderiza os 3 cards fake abaixo → loader chama
+     /api/google-places → se retornar OK, sobrescreve innerHTML
+     de .reviews__grid com cards reais + atualiza score/total +
+     preenche href dos [data-google-link] com a URL real do Maps.
+     Se a API falhar, os cards fake permanecem visíveis.
      ============================================================ */
   .reviews-section {
     position: relative;
@@ -67,7 +106,7 @@
     margin: 80px auto 0;
     padding: 0 24px;
   }
-  .reviews-grid {
+  .reviews__grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
@@ -82,18 +121,68 @@
     flex-direction: column;
     gap: 10px;
   }
-  .review-head { display: flex; align-items: center; gap: 12px; }
-  .review-avatar {
+  .review-card__head { display: flex; align-items: center; gap: 12px; }
+  .review-card__avatar {
     width: 44px; height: 44px; border-radius: 50%;
-    background: linear-gradient(135deg, #4285F4, #34A853);
     color: #fff; font-weight: 700; font-size: 18px;
     display: flex; align-items: center; justify-content: center;
     flex: none;
+    overflow: hidden; /* clip da foto do autor quando o Google retorna */
+    background: linear-gradient(135deg, #4285F4, #34A853); /* fallback default */
   }
-  .review-name { font-weight: 600; color: #0a2540; font-size: 15px; line-height: 1.2; }
-  .review-meta { font-size: 12px; color: #5f6368; margin-top: 2px; }
-  .review-stars { color: #fbbc04; font-size: 16px; letter-spacing: 1px; }
-  .review-text { color: #202124; font-size: 14px; line-height: 1.55; margin: 0; }
+  /* Variantes de cor do avatar (loader escolhe por hash do nome do autor).
+     Cores baseadas na paleta Google — mantém coerência com a estética
+     "Google Maps" da seção sem repetir a mesma cor em todos os cards. */
+  .review-card__avatar.avatar--A { background: linear-gradient(135deg, #EA4335, #FBBC04); }
+  .review-card__avatar.avatar--B { background: linear-gradient(135deg, #4285F4, #34A853); }
+  .review-card__avatar.avatar--C { background: linear-gradient(135deg, #34A853, #4285F4); }
+  .review-card__avatar.avatar--D { background: linear-gradient(135deg, #FBBC04, #EA4335); }
+  .review-card__avatar.avatar--E { background: linear-gradient(135deg, #4285F4, #EA4335); }
+  .review-card__avatar.avatar--F { background: linear-gradient(135deg, #34A853, #FBBC04); }
+
+  .review-card__name { font-weight: 600; color: #0a2540; font-size: 15px; line-height: 1.2; }
+  .review-card__name--link { color: #0a2540; text-decoration: none; }
+  .review-card__name--link:hover { text-decoration: underline; }
+  .review-card__meta { font-size: 12px; color: #5f6368; margin-top: 2px; }
+  .review-card__stars { color: #fbbc04; font-size: 16px; letter-spacing: 1px; }
+  .review-card__text { color: #202124; font-size: 14px; line-height: 1.55; margin: 0; }
+
+  /* Pill "via Google" no rodapé do card — assinatura visual de origem */
+  .review-card__source {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; color: #5f6368;
+    margin-top: 4px;
+  }
+  .review-card__source--link { text-decoration: none; }
+  .review-card__source--link:hover { text-decoration: underline; }
+
+  /* Mini "G" colorido do Google — usado no pill "via Google" dos cards.
+     SVG inline como background pra não depender de request de rede. */
+  .google-g {
+    display: inline-block; width: 12px; height: 12px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path fill='%23FFC107' d='M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z'/><path fill='%23FF3D00' d='M6.3 14.7l6.6 4.8C14.7 16 19 13 24 13c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z'/><path fill='%234CAF50' d='M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35 26.7 36 24 36c-5.3 0-9.7-3.1-11.3-7.5l-6.5 5C9.5 39.6 16.2 44 24 44z'/><path fill='%231976D2' d='M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.1 5.6l6.2 5.2c-.4.4 6.6-4.8 6.6-14.8 0-1.3-.1-2.3-.4-3.5z'/></svg>");
+    background-size: contain; background-repeat: no-repeat;
+    flex: none;
+  }
+
+  /* CTA "Ver todas no Google" — o loader preenche o href com a URL real
+     do perfil do negócio no Maps via [data-google-link]. */
+  .reviews__cta-google {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 14px;
+    padding: 10px 18px;
+    background: #fff;
+    border-radius: 999px;
+    box-shadow: 0 8px 20px rgba(0,30,80,0.14);
+    color: #0a2540;
+    font-size: 13px; font-weight: 600;
+    text-decoration: none;
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .reviews__cta-google:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 26px rgba(0,30,80,0.20);
+  }
 
   /* ============================================================
      CATÁLOGO — grid unificado, card clicável, CTA "ver mais"
@@ -263,51 +352,31 @@
     overflow: hidden;
     box-shadow: 0 40px 90px rgba(0,20,60,0.45);
     display: grid;
-    /* sem miniaturas por padrão: só stage + body */
     grid-template-columns: 1.35fr 1fr;
     animation: toyModalIn .3s ease-out;
-  }
-  /* Quando há mais de 1 imagem, mostra a coluna de miniaturas à esquerda */
-  .toy-modal__card.has-thumbs {
-    grid-template-columns: 92px 1.35fr 1fr;
   }
   @keyframes toyModalIn {
     from { opacity: 0; transform: translateY(14px) scale(.98); }
     to   { opacity: 1; transform: translateY(0) scale(1); }
   }
 
-  /* --- coluna 1: miniaturas verticais --- */
-  .toy-modal__thumbs {
-    display: none;   /* escondida por padrão; card.has-thumbs mostra */
-    flex-direction: column;
-    gap: 8px;
-    padding: 20px 8px 20px 16px;
-    overflow-y: auto;
-    background: #ffffff;
-    border-right: 1px solid #f0f2f5;
-  }
-  .toy-modal__card.has-thumbs .toy-modal__thumbs { display: flex; }
-  .toy-modal__thumb {
-    flex: none;
-    width: 64px; height: 64px;
-    border-radius: 10px;
-    overflow: hidden;
-    border: 2px solid #e6e8ec;
-    padding: 0; cursor: pointer;
-    background: #eee;
-    transition: border-color .2s ease, transform .2s ease;
-  }
-  .toy-modal__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .toy-modal__thumb.is-active { border-color: #2f76ff; }
-  .toy-modal__thumb:hover { transform: translateY(-1px); }
-
-  /* --- coluna 2: foto principal grande --- */
+  /* --- coluna 1: foto principal com LUPA DE ZOOM ---
+     A lupa aparece ao passar o mouse (desktop) ou tocar (mobile) sobre
+     a imagem. Ela mostra uma seção ampliada 2.5x da região sob o cursor,
+     usando background-image + background-position calculados via JS. */
   .toy-modal__stage {
     position: relative;
     background: #f6f7f9;
     display: flex; align-items: center; justify-content: center;
     min-height: 520px;
     padding: 24px;
+    overflow: hidden;
+  }
+  .toy-modal__stage-wrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex; align-items: center; justify-content: center;
   }
   .toy-modal__main-img {
     max-width: 100%;
@@ -317,7 +386,45 @@
     object-fit: cover;
     border-radius: 12px;
     display: block;
+    cursor: zoom-in;
+    pointer-events: auto;   /* precisa capturar mouse/touch pra lupa */
+    user-select: none;
+    -webkit-user-drag: none;
   }
+  /* A lupa circular que segue o cursor */
+  .toy-modal__lens {
+    position: absolute;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.9);
+    box-shadow: 0 8px 30px rgba(0,20,60,0.35), inset 0 0 0 1px rgba(0,0,0,0.1);
+    pointer-events: none;
+    background-repeat: no-repeat;
+    background-color: #f6f7f9;
+    opacity: 0;
+    transition: opacity .18s ease;
+    z-index: 2;
+    transform: translate(-50%, -50%);
+    display: none;   /* JS mostra quando a imagem carrega */
+  }
+  .toy-modal__lens.is-visible { opacity: 1; }
+  /* Dica visual no canto da imagem: "🔍 passe o mouse pra ampliar" */
+  .toy-modal__zoom-hint {
+    position: absolute;
+    bottom: 34px; left: 34px;
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(10,37,64,0.82);
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 12px; font-weight: 500;
+    pointer-events: none;
+    z-index: 2;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    transition: opacity .2s ease;
+  }
+  .toy-modal__stage.is-zooming .toy-modal__zoom-hint { opacity: 0; }
 
   /* --- coluna 3: conteúdo --- */
   .toy-modal__body {
@@ -416,16 +523,21 @@
   body.toy-modal-open { overflow: hidden; }
 
   /* ============================================================
-     BARRA DE PESQUISA (hero) — translúcida, arredondada, com
-     sugestões flutuantes que abrem o modal do brinquedo.
-     Isolada por classe .hero-search pra não vazar em outros
-     lugares da página.
+     BARRA DE PESQUISA (hero) — POSICIONADA NO TOPO da seção hero.
+     - Position absolute pra "descolar" do logo e ficar próxima do
+       topo da página (~24px do topo, centralizada horizontalmente).
+     - Isso libera o logo pra ficar bem centralizado verticalmente
+       no hero, sem competir com a busca por espaço.
+     - Isolada por classe .hero-search pra não vazar em outros
+       lugares da página.
      ============================================================ */
   .hero-search {
-    position: relative;
-    width: 100%;
+    position: absolute;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 48px);   /* respiro de 24px pros lados */
     max-width: 560px;
-    margin: 0 auto 28px;
     z-index: 20;   /* precisa ficar acima dos CTAs e do parallax */
   }
   .hero-search__box {
@@ -586,10 +698,9 @@
 
     /* --- MODAL mobile: vira coluna, tela cheia confortável --- */
     .toy-modal { padding: 0; }
-    .toy-modal__card,
-    .toy-modal__card.has-thumbs {
+    .toy-modal__card {
       grid-template-columns: 1fr;
-      grid-template-rows: auto auto 1fr;
+      grid-template-rows: auto 1fr;
       max-width: 100%;
       width: 100%;
       max-height: 100vh;
@@ -605,21 +716,15 @@
     .toy-modal__main-img {
       border-radius: 0;
       height: 100%;
+      cursor: default;   /* no mobile, sem hover-zoom */
     }
-    /* Miniaturas: no mobile viram uma faixa horizontal logo abaixo da foto */
-    .toy-modal__card.has-thumbs .toy-modal__thumbs {
-      flex-direction: row;
-      overflow-x: auto;
-      overflow-y: hidden;
-      padding: 10px 12px;
-      border-right: 0;
-      border-bottom: 1px solid #f0f2f5;
-      order: 2;
-    }
+    /* Esconde lupa/hint no mobile — hover-zoom não funciona bem em touch */
+    .toy-modal__lens,
+    .toy-modal__zoom-hint { display: none !important; }
     .toy-modal__body {
       padding: 20px 20px 28px;
       border-left: 0;
-      order: 3;
+      order: 2;
     }
     .toy-modal__title { font-size: 24px; }
     .toy-modal__cta { width: 100%; }
@@ -661,13 +766,14 @@
     #catalogo { padding-top: 80px; }
 
     /* --- 3) REVIEWS: cards em coluna única no mobile -------- */
-    .reviews-grid { grid-template-columns: 1fr; gap: 14px; }
+    .reviews__grid { grid-template-columns: 1fr; gap: 14px; }
     .reviews-section { margin-top: 56px; }
 
     /* --- 4) BARRA DE PESQUISA no mobile ---
-       Compacta o padding, reduz margem inferior e limita a altura
-       do painel de sugestões pra não cobrir o botão de CTA. */
-    .hero-search { margin-bottom: 22px; }
+       Agora fica absolute no topo do hero (não empurra o logo).
+       Compacta padding e limita a altura do painel de sugestões
+       pra não cobrir os CTAs. */
+    .hero-search { top: 16px; }
     .hero-search__box { padding: 12px 18px; }
     .hero-search__input { font-size: 15px; }
     .hero-search__panel { max-height: 300px; }
@@ -690,34 +796,34 @@
       fetchpriority="high" decoding="async"
       style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.95; z-index:1;">
 
+    <!-- ============================================================
+         BARRA DE PESQUISA — POSICIONADA NO TOPO do hero (absolute).
+         - Fica próxima ao topo da página, bem visível de cara.
+         - Independente do logo (não empurra ele pra baixo).
+         - O painel de sugestões (.hero-search__panel) é populado
+           dinamicamente no componentDidMount lendo os data-attrs
+           de todos os .toy-card (principais + extras).
+         - Clique numa sugestão reaproveita openModal() do modal
+           do catálogo — mesma UX de clicar num card.
+         ============================================================ -->
+    <div class="hero-search" id="heroSearch" role="search">
+      <label class="hero-search__box" for="heroSearchInput">
+        <svg class="hero-search__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input id="heroSearchInput" class="hero-search__input" type="text"
+          placeholder="Qual brinquedo vai bombar a sua festa?"
+          autocomplete="off" spellcheck="false"
+          aria-label="Pesquisar brinquedos no catálogo"
+          aria-controls="heroSearchPanel" aria-expanded="false">
+        <button type="button" class="hero-search__clear" id="heroSearchClear" aria-label="Limpar pesquisa">×</button>
+      </label>
+      <div class="hero-search__panel" id="heroSearchPanel" role="listbox" aria-label="Sugestões de brinquedos"></div>
+    </div>
+
     <!-- logo central -->
     <div style="position:relative; z-index:3; text-align:center; width:100%; max-width:1220px; display:flex; flex-direction:column; align-items:center;">
-
-      <!-- ============================================================
-           BARRA DE PESQUISA — fica no TOPO do hero, acima do logo.
-           - .hero-search abre/fecha via classes .is-open / .has-value
-             adicionadas pelo JS.
-           - O painel de sugestões (.hero-search__panel) é populado
-             dinamicamente no componentDidMount lendo os data-attrs
-             de todos os .toy-card (principais + extras).
-           - Clique numa sugestão reaproveita openModal() do modal
-             do catálogo — mesma UX de clicar num card.
-           ============================================================ -->
-      <div class="hero-search" id="heroSearch" role="search">
-        <label class="hero-search__box" for="heroSearchInput">
-          <svg class="hero-search__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="11" cy="11" r="7"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input id="heroSearchInput" class="hero-search__input" type="text"
-            placeholder="Qual brinquedo vai bombar a sua festa? 🎈"
-            autocomplete="off" spellcheck="false"
-            aria-label="Pesquisar brinquedos no catálogo"
-            aria-controls="heroSearchPanel" aria-expanded="false">
-          <button type="button" class="hero-search__clear" id="heroSearchClear" aria-label="Limpar pesquisa">×</button>
-        </label>
-        <div class="hero-search__panel" id="heroSearchPanel" role="listbox" aria-label="Sugestões de brinquedos"></div>
-      </div>
 
       <img class="hero-logo" src="uploads/assets hero - globo e mundo feliz.png" alt="Mundo Feliz - Locações de Brinquedos"
         fetchpriority="high" decoding="async"
@@ -768,10 +874,11 @@
           <article class="toy-card"
             data-toy-name="{{ t.name }}"
             data-toy-desc="{{ t.desc }}"
-            data-toy-imgs="{{ t.imgs }}"
+            data-toy-img="{{ t.img }}"
             role="button" tabindex="0"
             aria-label="Ver detalhes de {{ t.name }}">
-            <img class="toy-card__img" src="{{ t.img }}" alt="{{ t.name }}" loading="lazy" decoding="async">
+            <img class="toy-card__img" src="{{ t.img }}" alt="{{ t.name }}"
+              width="800" height="1000" loading="lazy" decoding="async">
             <div class="toy-card__fade"></div>
             <div class="toy-card__foot">
               <h3 class="toy-card__name">{{ t.name }}</h3>
@@ -801,10 +908,11 @@
             <article class="toy-card"
               data-toy-name="{{ t.name }}"
               data-toy-desc="{{ t.desc }}"
-              data-toy-imgs="{{ t.imgs }}"
+              data-toy-img="{{ t.img }}"
               role="button" tabindex="0"
               aria-label="Ver detalhes de {{ t.name }}">
-              <img class="toy-card__img" src="{{ t.img }}" alt="{{ t.name }}" loading="lazy" decoding="async">
+              <img class="toy-card__img" src="{{ t.img }}" alt="{{ t.name }}"
+                width="800" height="1000" loading="lazy" decoding="async">
               <div class="toy-card__fade"></div>
               <div class="toy-card__foot">
                 <h3 class="toy-card__name">{{ t.name }}</h3>
@@ -821,24 +929,33 @@
 
     <!-- ==========================================================
          MODAL DO BRINQUEDO — reaproveitado por qualquer card.
-         Preparado pra múltiplas imagens (miniaturas embaixo).
-         Enquanto só houver 1 imagem por brinquedo, a faixa de
-         miniaturas fica escondida automaticamente (has-many).
+         Layout em 2 colunas: foto grande à esquerda (com lupa de
+         zoom que segue o cursor no desktop) + descrição/CTA à
+         direita. Mobile empilha em coluna única.
          ========================================================== -->
     <div class="toy-modal" id="toyModal" role="dialog" aria-modal="true" aria-labelledby="toyModalTitle" aria-hidden="true">
       <div class="toy-modal__backdrop" data-modal-close></div>
       <div class="toy-modal__card" id="toyModalCard">
         <button type="button" class="toy-modal__close" data-modal-close aria-label="Fechar">×</button>
 
-        <!-- coluna 1: miniaturas (aparecem se houver >1 imagem via .has-thumbs no card) -->
-        <div class="toy-modal__thumbs" id="toyModalThumbs"></div>
-
-        <!-- coluna 2: foto principal -->
-        <div class="toy-modal__stage">
-          <img class="toy-modal__main-img" id="toyModalMainImg" src="" alt="">
+        <!-- coluna 1: foto principal com lupa de zoom (segue o cursor no desktop) -->
+        <div class="toy-modal__stage" id="toyModalStage">
+          <div class="toy-modal__stage-wrap">
+            <img class="toy-modal__main-img" id="toyModalMainImg" src="" alt="">
+            <div class="toy-modal__lens" id="toyModalLens" aria-hidden="true"></div>
+          </div>
+          <div class="toy-modal__zoom-hint" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="7"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              <line x1="11" y1="8" x2="11" y2="14"></line>
+              <line x1="8" y1="11" x2="14" y2="11"></line>
+            </svg>
+            Passe o mouse pra ampliar
+          </div>
         </div>
 
-        <!-- coluna 3: conteúdo -->
+        <!-- coluna 2: conteúdo -->
         <div class="toy-modal__body">
           <span class="toy-modal__eyebrow">Locação · <strong>Mundo Feliz</strong></span>
           <h3 class="toy-modal__title" id="toyModalTitle"></h3>
@@ -925,8 +1042,11 @@
     </div>
 
     <!-- ============================================== -->
-    <!-- 3.1 AVALIAÇÕES (estilo Google Maps - fake)     -->
-    <!-- ============================================== -->
+    <!-- 3.1 AVALIAÇÕES (Google Maps — real via API + fallback fake)   -->
+    <!-- ============================================================= -->
+    <!-- Os 3 cards abaixo + score/total são FALLBACK. Se /api/google-  -->
+    <!-- places responder OK, o reviews-loader.js sobrescreve tudo com  -->
+    <!-- dados reais. Classes seguem BEM porque o loader depende delas. -->
     <section class="reviews-section" aria-label="Avaliações de clientes">
       <div style="text-align:center; margin-bottom:28px;">
         <div style="display:inline-flex; align-items:center; gap:10px; background:#fff; padding:10px 18px; border-radius:999px; box-shadow:0 10px 24px rgba(0,30,80,0.16);">
@@ -937,51 +1057,68 @@
             <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35 26.7 36 24 36c-5.3 0-9.7-3.1-11.3-7.5l-6.5 5C9.5 39.6 16.2 44 24 44z"/>
             <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.1 5.6l6.2 5.2c-.4.4 6.6-4.8 6.6-14.8 0-1.3-.1-2.3-.4-3.5z"/>
           </svg>
-          <strong style="font-size:14px; color:#0a2540;">4,9</strong>
-          <span style="color:#fbbc04; letter-spacing:1px;">★★★★★</span>
-          <span style="font-size:12px; color:#5f6368;">· 127 avaliações no Google</span>
+          <!-- Loader atualiza os spans abaixo com dados reais do Google -->
+          <strong class="reviews__summary-score" style="font-size:14px; color:#0a2540;">4,9</strong>
+          <span class="reviews__summary-stars" style="color:#fbbc04; letter-spacing:1px;">★★★★★</span>
+          <span class="reviews__summary-text" style="font-size:12px; color:#5f6368;">· 127 avaliações no Google</span>
         </div>
         <h3 style="margin:18px 0 0; font-family:'Fraunces', serif; font-style:italic; font-weight:700; font-size:clamp(28px, 4vw, 40px); color:#ffffff; text-shadow:0 4px 14px rgba(0,30,80,0.22);">
           O que dizem os clientes
         </h3>
       </div>
 
-      <div class="reviews-grid">
+      <div class="reviews__grid">
         <article class="review-card">
-          <div class="review-head">
-            <div class="review-avatar" style="background:linear-gradient(135deg,#EA4335,#FBBC04);">M</div>
+          <div class="review-card__head">
+            <div class="review-card__avatar avatar--A" aria-hidden="true">M</div>
             <div>
-              <div class="review-name">Mariana Silva</div>
-              <div class="review-meta">Local Guide · há 2 semanas</div>
+              <div class="review-card__name">Mariana Silva</div>
+              <div class="review-card__meta">Local Guide · há 2 semanas</div>
             </div>
           </div>
-          <div class="review-stars">★★★★★</div>
-          <p class="review-text">Aluguei a piscina de bolinhas para o aniversário do meu filho. Brinquedo limpíssimo, montagem rapidíssima e a equipe foi super atenciosa. As crianças amaram, recomendo demais!</p>
+          <div class="review-card__stars" aria-label="5 estrelas">★★★★★</div>
+          <p class="review-card__text">"Aluguei a piscina de bolinhas para o aniversário do meu filho. Brinquedo limpíssimo, montagem rapidíssima e a equipe foi super atenciosa. As crianças amaram, recomendo demais!"</p>
+          <span class="review-card__source"><span class="google-g" aria-hidden="true"></span> via Google</span>
         </article>
 
         <article class="review-card">
-          <div class="review-head">
-            <div class="review-avatar" style="background:linear-gradient(135deg,#4285F4,#34A853);">R</div>
+          <div class="review-card__head">
+            <div class="review-card__avatar avatar--B" aria-hidden="true">R</div>
             <div>
-              <div class="review-name">Rafael Mendes</div>
-              <div class="review-meta">há 1 mês</div>
+              <div class="review-card__name">Rafael Mendes</div>
+              <div class="review-card__meta">há 1 mês</div>
             </div>
           </div>
-          <div class="review-stars">★★★★★</div>
-          <p class="review-text">O barco pirata foi o sucesso da festa! Entregaram no horário combinado, tudo higienizado e em ótimo estado. Atendimento no WhatsApp foi excelente, tirou todas as minhas dúvidas.</p>
+          <div class="review-card__stars" aria-label="5 estrelas">★★★★★</div>
+          <p class="review-card__text">"O barco pirata foi o sucesso da festa! Entregaram no horário combinado, tudo higienizado e em ótimo estado. Atendimento no WhatsApp foi excelente, tirou todas as minhas dúvidas."</p>
+          <span class="review-card__source"><span class="google-g" aria-hidden="true"></span> via Google</span>
         </article>
 
         <article class="review-card">
-          <div class="review-head">
-            <div class="review-avatar" style="background:linear-gradient(135deg,#34A853,#4285F4);">C</div>
+          <div class="review-card__head">
+            <div class="review-card__avatar avatar--C" aria-hidden="true">C</div>
             <div>
-              <div class="review-name">Camila Rocha</div>
-              <div class="review-meta">Local Guide · há 3 semanas</div>
+              <div class="review-card__name">Camila Rocha</div>
+              <div class="review-card__meta">Local Guide · há 3 semanas</div>
             </div>
           </div>
-          <div class="review-stars">★★★★★</div>
-          <p class="review-text">Já é a terceira vez que loco com a Mundo Feliz. Preço justo, brinquedos sempre novos e a retirada é tranquila. Virou a empresa oficial das festas lá de casa 🎉</p>
+          <div class="review-card__stars" aria-label="5 estrelas">★★★★★</div>
+          <p class="review-card__text">"Já é a terceira vez que loco com a Mundo Feliz. Preço justo, brinquedos sempre novos e a retirada é tranquila. Virou a empresa oficial das festas lá de casa 🎉"</p>
+          <span class="review-card__source"><span class="google-g" aria-hidden="true"></span> via Google</span>
         </article>
+      </div>
+
+      <!-- CTA "Ver todas no Google": href preenchido pelo loader com a
+           URL real do perfil do negócio no Maps. Fica como "#" no HTML
+           pra não levar a lugar nenhum se o JS não rodar. -->
+      <div style="text-align:center;">
+        <a class="reviews__cta-google" href="#" data-google-link rel="noopener">
+          <span class="google-g" aria-hidden="true"></span>
+          Ver todas no Google
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M7 17L17 7M9 7h8v8"/>
+          </svg>
+        </a>
       </div>
     </section>
 
@@ -1002,57 +1139,60 @@
 class Component extends DCLogic {
   renderVals() {
     // Em modo standalone, as imagens vêm de window.__resources (blob URLs).
+    // Os IDs abaixo batem com os <meta name="ext-resource-dependency"> no <head>.
     const R = (typeof window !== 'undefined' && window.__resources) || {};
+
+    // Helper pra fallback do path direto quando não estamos em modo bundle
+    const img = (id, path) => R[id] || path;
+
     return {
-      // Imagens disponíveis hoje (3). Enquanto não subimos as reais dos brinquedos
-      // extras, reaproveitamos essas três em rodízio como placeholder visual.
-      // O campo `imgs` é uma lista pipe-separada — no dia em que existir mais de
-      // uma foto por brinquedo, o modal já mostra automaticamente as miniaturas.
+      // ============================================================
+      // 3 BRINQUEDOS EM DESTAQUE — os inflaveis maiores, que puxam
+      // a atenção primeiro. Restante fica no "Ver catálogo completo".
+      // ============================================================
       toys: [
+        { name: 'Tombo Legal',
+          desc: 'Torre inflável com piscina de bolinhas e escalada colorida. Um dos brinquedos que mais faz sucesso na festa — as crianças sobem, escorregam e caem direto no mar de bolinhas.',
+          img: img('tomboLegal', 'uploads/tombo-legal.webp') },
+        { name: 'Tobogã Premium',
+          desc: 'Escorregador inflável gigante (4,5m de comprimento × 2,80m de largura × 4,0m de altura) com escalada e descida em alta velocidade. Vira a atração principal da festa.',
+          img: img('tobogaPremium', 'uploads/toboga-premium.webp') },
         { name: 'Piscina de Bolinhas',
-          desc: 'Mergulho colorido de diversão pros pequenos. Higienizada, com bolinhas novas e proteção em todas as bordas — clássico que nunca falha em festa infantil.',
-          img: R.toy1 || 'uploads/toy1.png',
-          imgs: (R.toy1 || 'uploads/toy1.png') },
-        { name: 'Barco Pirata',
-          desc: 'Tobogã inflável gigante em forma de navio pirata. Escalada, escorrega e muita aventura — o brinquedo que vira a atração principal da festa.',
-          img: R.toy2 || 'uploads/toy2.png',
-          imgs: (R.toy2 || 'uploads/toy2.png') },
-        { name: 'Tenda de Bolinhas',
-          desc: 'Tenda inflável espaçosa, perfeita pra festas em casa. Ideal pra crianças menores brincarem com segurança e conforto num espaço só delas.',
-          img: R.toy3 || 'uploads/toy3.png',
-          imgs: (R.toy3 || 'uploads/toy3.png') }
+          desc: 'Piscina de bolinhas com tenda colorida e tela de proteção 360°. Ideal pra crianças menores brincarem com segurança e conforto num espaço só delas.',
+          img: img('piscinaBolinhas', 'uploads/piscina-bolinhas.webp') }
       ],
-      // Brinquedos extras — revelados no clique de "Ver catálogo completo".
-      // Total do catálogo: 3 principais + 7 extras = 10 cards.
+      // ============================================================
+      // BRINQUEDOS EXTRAS — revelados no clique de "Ver catálogo
+      // completo". Total do catálogo: 3 principais + 9 extras = 12.
+      // ============================================================
       toysExtra: [
-        { name: 'Castelo Inflável',
-          desc: 'Castelo inflável colorido com área ampla pra pular. Um dos brinquedos mais pedidos pra festas de aniversário — diversão garantida do começo ao fim.',
-          img: R.toy1 || 'uploads/toy1.png',
-          imgs: (R.toy1 || 'uploads/toy1.png') },
-        { name: 'Tobogã Gigante',
-          desc: 'Escorregador inflável enorme, com escalada e descida em alta velocidade. Traz aquela sensação de parque aquático direto pro quintal.',
-          img: R.toy2 || 'uploads/toy2.png',
-          imgs: (R.toy2 || 'uploads/toy2.png') },
         { name: 'Cama Elástica',
-          desc: 'Cama elástica com tela de proteção 360°. Segura, resistente e com aquela alegria clássica de pular sem parar. Acompanha equipe pra montagem.',
-          img: R.toy3 || 'uploads/toy3.png',
-          imgs: (R.toy3 || 'uploads/toy3.png') },
-        { name: 'Escorregador Aquático',
-          desc: 'Escorregador inflável com jato de água — perfeito pra festas de verão. Vem com bomba e todo o kit de instalação pronto pra usar.',
-          img: R.toy1 || 'uploads/toy1.png',
-          imgs: (R.toy1 || 'uploads/toy1.png') },
-        { name: 'Touro Mecânico Kids',
-          desc: 'Versão infantil do touro mecânico, com velocidade controlada e almofadas de proteção. Faz sucesso absoluto com a criançada mais aventureira.',
-          img: R.toy2 || 'uploads/toy2.png',
-          imgs: (R.toy2 || 'uploads/toy2.png') },
-        { name: 'Circuito de Obstáculos',
-          desc: 'Estrutura inflável longa com túneis, escaladas e obstáculos. Ótimo pra grupos maiores — divide as crianças em times e vira brincadeira coletiva.',
-          img: R.toy3 || 'uploads/toy3.png',
-          imgs: (R.toy3 || 'uploads/toy3.png') },
-        { name: 'Kid Play com Escorregador',
-          desc: 'Playground inflável compacto com escorregador e área de pulo. Perfeito pra festas com espaço mais reduzido, sem abrir mão da diversão.',
-          img: R.toy1 || 'uploads/toy1.png',
-          imgs: (R.toy1 || 'uploads/toy1.png') }
+          desc: 'Cama elástica grande com tela de proteção 360° e escada acolchoada. Segura, resistente e com aquela alegria clássica de pular sem parar. Acompanha equipe pra montagem.',
+          img: img('camaElastica', 'uploads/cama-elastica.webp') },
+        { name: 'Mini Centopéia',
+          desc: 'Inflável em formato de centopéia com escorregador e escalada — 5,0m de comprimento × 2,10m de largura × 3,0m de altura. Diversão colorida e temática pros pequenos.',
+          img: img('miniCentopeia', 'uploads/mini-centopeia.webp') },
+        { name: 'Touro Mecânico',
+          desc: 'Touro mecânico profissional com colchão inflável de 4,5m × 4,5m ao redor, velocidade controlada e total segurança. Faz sucesso absoluto com adolescentes e adultos aventureiros.',
+          img: img('touroMecanico', 'uploads/touro-mecanico.webp') },
+        { name: 'Mini Tobogã Tigrinho',
+          desc: 'Tobogã inflável menor no tema tigre, com escorregador e área de pulo. Perfeito pra festas com espaço reduzido — mantém toda a diversão em formato compacto.',
+          img: img('miniTobogaTigrinho', 'uploads/mini-toboga-tigrinho.webp') },
+        { name: 'Futebol de Sabão',
+          desc: 'Arena inflável longa com traves e piso escorregadio de sabão. Diversão garantida em grupo — vira o campeonato oficial da festa, com direito a plateia rindo do lado de fora.',
+          img: img('futebolSabao', 'uploads/futebol-sabao.webp') },
+        { name: 'Totó',
+          desc: 'Mesa de pebolim (totó) de madeira profissional, com jogadores em ferro e placar embutido. Clássico atemporal que junta crianças, adolescentes e adultos ao redor da mesa.',
+          img: img('toto', 'uploads/toto.webp') },
+        { name: 'Ping Pong',
+          desc: 'Mesa oficial de ping pong (1,85m × 1,00m) com raquetes e bolinhas inclusas. Diversão que atravessa gerações — perfeita pra torneios rápidos entre convidados.',
+          img: img('pingPong', 'uploads/ping-pong.webp') },
+        { name: 'Algodão Doce',
+          desc: 'Máquina profissional de algodão doce em aço inox, com controle de saída e reset de emergência. Aroma característico que perfuma a festa inteira — acompanha açúcar colorido.',
+          img: img('algodaoDoce', 'uploads/algodao-doce.webp') },
+        { name: 'Pipoqueira Elétrica',
+          desc: 'Pipoqueira profissional estilo cinema, com vitrine iluminada e capacidade generosa. Pipoca fresquinha durante toda a festa — clássico que ninguém resiste.',
+          img: img('pipoqueira', 'uploads/pipoqueira.webp') }
       ]
     };
   }
@@ -1143,11 +1283,10 @@ class Component extends DCLogic {
     // CATÁLOGO — toggle "Ver catálogo completo" + modal do brinquedo
     // ------------------------------------------------------------
     // - Cada card (.toy-card) carrega os dados nos data-attrs
-    //   (data-toy-name, data-toy-desc, data-toy-imgs).
-    // - data-toy-imgs é pipe-separado ("url1|url2|..."). Enquanto
-    //   houver só 1 imagem, a faixa de miniaturas fica escondida
-    //   (classe .has-many controla). No dia em que subir mais
-    //   fotos por brinquedo, é só passar mais URLs separadas por |.
+    //   (data-toy-name, data-toy-desc, data-toy-img).
+    // - Uma única imagem por brinquedo. No modal, a imagem principal
+    //   tem uma LUPA DE ZOOM que segue o cursor (desktop) — permite
+    //   ver detalhes da foto sem precisar de miniaturas.
     // ============================================================
     const WHATSAPP_NUMBER = '5531992567510'; // mesmo número da seção de contato
 
@@ -1171,7 +1310,8 @@ class Component extends DCLogic {
     const modalTitle   = document.getElementById('toyModalTitle');
     const modalDesc    = document.getElementById('toyModalDesc');
     const modalMainImg = document.getElementById('toyModalMainImg');
-    const modalThumbs  = document.getElementById('toyModalThumbs');
+    const modalStage   = document.getElementById('toyModalStage');
+    const modalLens    = document.getElementById('toyModalLens');
     const modalCta     = document.getElementById('toyModalCta');
 
     const buildWhatsappHref = (toyName) => {
@@ -1183,7 +1323,7 @@ class Component extends DCLogic {
     const readToy = (cardEl) => ({
       name: cardEl.dataset.toyName || '',
       desc: cardEl.dataset.toyDesc || '',
-      imgs: cardEl.dataset.toyImgs || ''
+      img:  cardEl.dataset.toyImg  || ''
     });
 
     const openModal = (toy) => {
@@ -1191,34 +1331,15 @@ class Component extends DCLogic {
       modalTitle.textContent = toy.name;
       modalDesc.textContent  = toy.desc;
 
-      // Galeria: divide o pipe-separado em array.
-      const imgs = (toy.imgs || '').split('|').map(s => s.trim()).filter(Boolean);
-      const first = imgs[0] || '';
-      modalMainImg.src = first;
+      // Só uma imagem por brinquedo agora — sem galeria de miniaturas.
+      modalMainImg.src = toy.img || '';
       modalMainImg.alt = toy.name;
 
-      // Miniaturas SEMPRE visíveis. Enquanto o brinquedo tiver só 1 foto,
-      // a gente repete essa mesma imagem pra mostrar o affordance da galeria.
-      // Quando você subir fotos reais (pipe-separadas em `imgs`), passa a
-      // mostrar cada uma automaticamente.
-      const thumbList = imgs.length > 1 ? imgs : (first ? [first, first, first, first] : []);
-      modalThumbs.innerHTML = '';
-      if (thumbList.length > 0) {
-        modalCardEl.classList.add('has-thumbs');
-        thumbList.forEach((url, i) => {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'toy-modal__thumb' + (i === 0 ? ' is-active' : '');
-          btn.innerHTML = `<img src="${url}" alt="">`;
-          btn.addEventListener('click', () => {
-            modalMainImg.src = url;
-            modalThumbs.querySelectorAll('.toy-modal__thumb').forEach(t => t.classList.remove('is-active'));
-            btn.classList.add('is-active');
-          });
-          modalThumbs.appendChild(btn);
-        });
-      } else {
-        modalCardEl.classList.remove('has-thumbs');
+      // Prepara a lupa: a background-image dela é a MESMA imagem em zoom,
+      // e o background-position é calculado pelo mouse via setupZoomLens.
+      if (modalLens) {
+        modalLens.style.backgroundImage = toy.img ? `url("${toy.img}")` : '';
+        modalLens.classList.remove('is-visible');
       }
 
       modalCta.href = buildWhatsappHref(toy.name);
@@ -1227,6 +1348,76 @@ class Component extends DCLogic {
       modal.setAttribute('aria-hidden', 'false');
       document.body.classList.add('toy-modal-open');
     };
+
+    // ============================================================
+    // LUPA DE ZOOM — ampliação estilo e-commerce (Mercado Livre)
+    // ------------------------------------------------------------
+    // Ao mover o mouse sobre a imagem principal do modal, uma lupa
+    // circular aparece seguindo o cursor. Ela usa a MESMA imagem em
+    // zoom (2.5x) como background, com background-position calculado
+    // proporcionalmente à posição do cursor sobre a imagem.
+    //
+    // Detalhes:
+    // - ZOOM: fator de ampliação. 2.5x = confortável pra ver textura
+    //   sem pixelar demais imagens de resolução média.
+    // - Desabilitada em telas mobile (via CSS) — hover não funciona
+    //   bem em touch, e o usuário mobile já pode dar pinch-zoom no
+    //   navegador se quiser detalhes.
+    // ============================================================
+    if (modalStage && modalMainImg && modalLens) {
+      const ZOOM = 2.5;
+
+      const updateLens = (ev) => {
+        const rect = modalMainImg.getBoundingClientRect();
+        const stageRect = modalStage.getBoundingClientRect();
+
+        // Posição do cursor RELATIVA à imagem (não ao stage)
+        const x = ev.clientX - rect.left;
+        const y = ev.clientY - rect.top;
+
+        // Se saiu dos limites da imagem, esconde a lupa
+        if (x < 0 || y < 0 || x > rect.width || y > rect.height) {
+          modalLens.classList.remove('is-visible');
+          modalStage.classList.remove('is-zooming');
+          return;
+        }
+
+        // Tamanho da imagem ampliada (fundo da lupa)
+        const bgW = rect.width  * ZOOM;
+        const bgH = rect.height * ZOOM;
+
+        // Posiciona a lupa RELATIVA ao stage (o pai posicionado)
+        const lensX = ev.clientX - stageRect.left;
+        const lensY = ev.clientY - stageRect.top;
+        modalLens.style.left = lensX + 'px';
+        modalLens.style.top  = lensY + 'px';
+        modalLens.style.display = 'block';
+
+        // Metade do tamanho da lupa (pra centralizar o ponto sob o cursor)
+        const lensSize = modalLens.offsetWidth;
+        const half = lensSize / 2;
+
+        // Position do background: puxa a imagem ampliada de forma que o
+        // ponto sob o cursor fique CENTRALIZADO no círculo da lupa.
+        const bgX = -(x * ZOOM - half);
+        const bgY = -(y * ZOOM - half);
+
+        modalLens.style.backgroundSize = bgW + 'px ' + bgH + 'px';
+        modalLens.style.backgroundPosition = bgX + 'px ' + bgY + 'px';
+        modalLens.classList.add('is-visible');
+        modalStage.classList.add('is-zooming');
+      };
+
+      const hideLens = () => {
+        modalLens.classList.remove('is-visible');
+        modalStage.classList.remove('is-zooming');
+      };
+
+      // Escuta no stage inteiro (não só na imagem) pra evitar flicker
+      // quando o cursor cruza a borda do wrapper interno.
+      modalStage.addEventListener('mousemove', updateLens);
+      modalStage.addEventListener('mouseleave', hideLens);
+    }
 
     const closeModal = () => {
       if (!modal) return;
@@ -1278,7 +1469,7 @@ class Component extends DCLogic {
     // ao clicar numa sugestão, abre o mesmo modal do catálogo.
     // ------------------------------------------------------------
     // Fonte de dados: os próprios .toy-card renderizados no DOM
-    // (data-toy-name / data-toy-desc / data-toy-imgs). Assim a
+    // (data-toy-name / data-toy-desc / data-toy-img). Assim a
     // busca cobre AUTOMATICAMENTE tanto os brinquedos principais
     // quanto os "extras" — sem precisar duplicar a lista aqui.
     // ============================================================
@@ -1298,12 +1489,10 @@ class Component extends DCLogic {
           const name = (card.dataset.toyName || '').trim();
           if (!name || seen.has(name.toLowerCase())) return;
           seen.add(name.toLowerCase());
-          const imgs = (card.dataset.toyImgs || '').split('|').map(s => s.trim()).filter(Boolean);
           list.push({
             name,
             desc: card.dataset.toyDesc || '',
-            imgs: card.dataset.toyImgs || '',
-            thumb: imgs[0] || ''
+            img:  card.dataset.toyImg  || ''
           });
         });
         return list;
@@ -1339,7 +1528,7 @@ class Component extends DCLogic {
             item.setAttribute('role', 'option');
             item.dataset.idx = String(i);
             item.innerHTML = `
-              <img class="hero-search__thumb" src="${toy.thumb}" alt="" loading="lazy">
+              <img class="hero-search__thumb" src="${toy.img}" alt="" loading="lazy">
               <div class="hero-search__info">
                 <span class="hero-search__name"></span>
                 <span class="hero-search__cat">Locação · Mundo Feliz</span>
@@ -1364,7 +1553,7 @@ class Component extends DCLogic {
         if (!toy) return;
         closeSearchPanel();
         searchInput.blur();
-        openModal({ name: toy.name, desc: toy.desc, imgs: toy.imgs });
+        openModal({ name: toy.name, desc: toy.desc, img: toy.img });
       };
 
       const openSearchPanel = () => {
@@ -1435,5 +1624,10 @@ class Component extends DCLogic {
   }
 }
 </script>
+
+<!-- Carrega e injeta reviews reais do Google Places. Progressive
+     enhancement: se /api/google-places falhar, os cards fake acima
+     permanecem visíveis. defer = executa depois do parse do HTML. -->
+<script src="./reviews-loader.js" defer></script>
 </body>
 </html>
