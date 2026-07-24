@@ -3,9 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="ext-resource-dependency" content="uploads/toy1.png" data-resource-id="toy1" />
-<meta name="ext-resource-dependency" content="uploads/toy2.png" data-resource-id="toy2" />
-<meta name="ext-resource-dependency" content="uploads/toy3.png" data-resource-id="toy3" />
+<meta name="ext-resource-dependency" content="uploads/tombo-legal.png" data-resource-id="tomboLegal" />
+<meta name="ext-resource-dependency" content="uploads/toboga-premium.png" data-resource-id="tobogaPremium" />
+<meta name="ext-resource-dependency" content="uploads/piscina-bolinhas.png" data-resource-id="piscinaBolinhas" />
+<meta name="ext-resource-dependency" content="uploads/cama-elastica.png" data-resource-id="camaElastica" />
+<meta name="ext-resource-dependency" content="uploads/mini-centopeia.png" data-resource-id="miniCentopeia" />
+<meta name="ext-resource-dependency" content="uploads/touro-mecanico.png" data-resource-id="touroMecanico" />
+<meta name="ext-resource-dependency" content="uploads/mini-toboga-tigrinho.png" data-resource-id="miniTobogaTigrinho" />
+<meta name="ext-resource-dependency" content="uploads/toto.png" data-resource-id="toto" />
+<meta name="ext-resource-dependency" content="uploads/ping-pong.png" data-resource-id="pingPong" />
+<meta name="ext-resource-dependency" content="uploads/futebol-sabao.png" data-resource-id="futebolSabao" />
+<meta name="ext-resource-dependency" content="uploads/algodao-doce.png" data-resource-id="algodaoDoce" />
+<meta name="ext-resource-dependency" content="uploads/pipoqueira.png" data-resource-id="pipoqueira" />
 <script src="./support.js"></script>
 </head>
 <body>
@@ -323,51 +332,31 @@
     overflow: hidden;
     box-shadow: 0 40px 90px rgba(0,20,60,0.45);
     display: grid;
-    /* sem miniaturas por padrão: só stage + body */
     grid-template-columns: 1.35fr 1fr;
     animation: toyModalIn .3s ease-out;
-  }
-  /* Quando há mais de 1 imagem, mostra a coluna de miniaturas à esquerda */
-  .toy-modal__card.has-thumbs {
-    grid-template-columns: 92px 1.35fr 1fr;
   }
   @keyframes toyModalIn {
     from { opacity: 0; transform: translateY(14px) scale(.98); }
     to   { opacity: 1; transform: translateY(0) scale(1); }
   }
 
-  /* --- coluna 1: miniaturas verticais --- */
-  .toy-modal__thumbs {
-    display: none;   /* escondida por padrão; card.has-thumbs mostra */
-    flex-direction: column;
-    gap: 8px;
-    padding: 20px 8px 20px 16px;
-    overflow-y: auto;
-    background: #ffffff;
-    border-right: 1px solid #f0f2f5;
-  }
-  .toy-modal__card.has-thumbs .toy-modal__thumbs { display: flex; }
-  .toy-modal__thumb {
-    flex: none;
-    width: 64px; height: 64px;
-    border-radius: 10px;
-    overflow: hidden;
-    border: 2px solid #e6e8ec;
-    padding: 0; cursor: pointer;
-    background: #eee;
-    transition: border-color .2s ease, transform .2s ease;
-  }
-  .toy-modal__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .toy-modal__thumb.is-active { border-color: #2f76ff; }
-  .toy-modal__thumb:hover { transform: translateY(-1px); }
-
-  /* --- coluna 2: foto principal grande --- */
+  /* --- coluna 1: foto principal com LUPA DE ZOOM ---
+     A lupa aparece ao passar o mouse (desktop) ou tocar (mobile) sobre
+     a imagem. Ela mostra uma seção ampliada 2.5x da região sob o cursor,
+     usando background-image + background-position calculados via JS. */
   .toy-modal__stage {
     position: relative;
     background: #f6f7f9;
     display: flex; align-items: center; justify-content: center;
     min-height: 520px;
     padding: 24px;
+    overflow: hidden;
+  }
+  .toy-modal__stage-wrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex; align-items: center; justify-content: center;
   }
   .toy-modal__main-img {
     max-width: 100%;
@@ -377,7 +366,45 @@
     object-fit: cover;
     border-radius: 12px;
     display: block;
+    cursor: zoom-in;
+    pointer-events: auto;   /* precisa capturar mouse/touch pra lupa */
+    user-select: none;
+    -webkit-user-drag: none;
   }
+  /* A lupa circular que segue o cursor */
+  .toy-modal__lens {
+    position: absolute;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.9);
+    box-shadow: 0 8px 30px rgba(0,20,60,0.35), inset 0 0 0 1px rgba(0,0,0,0.1);
+    pointer-events: none;
+    background-repeat: no-repeat;
+    background-color: #f6f7f9;
+    opacity: 0;
+    transition: opacity .18s ease;
+    z-index: 2;
+    transform: translate(-50%, -50%);
+    display: none;   /* JS mostra quando a imagem carrega */
+  }
+  .toy-modal__lens.is-visible { opacity: 1; }
+  /* Dica visual no canto da imagem: "🔍 passe o mouse pra ampliar" */
+  .toy-modal__zoom-hint {
+    position: absolute;
+    bottom: 34px; left: 34px;
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(10,37,64,0.82);
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 12px; font-weight: 500;
+    pointer-events: none;
+    z-index: 2;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    transition: opacity .2s ease;
+  }
+  .toy-modal__stage.is-zooming .toy-modal__zoom-hint { opacity: 0; }
 
   /* --- coluna 3: conteúdo --- */
   .toy-modal__body {
@@ -647,10 +674,9 @@
 
     /* --- MODAL mobile: vira coluna, tela cheia confortável --- */
     .toy-modal { padding: 0; }
-    .toy-modal__card,
-    .toy-modal__card.has-thumbs {
+    .toy-modal__card {
       grid-template-columns: 1fr;
-      grid-template-rows: auto auto 1fr;
+      grid-template-rows: auto 1fr;
       max-width: 100%;
       width: 100%;
       max-height: 100vh;
@@ -666,21 +692,15 @@
     .toy-modal__main-img {
       border-radius: 0;
       height: 100%;
+      cursor: default;   /* no mobile, sem hover-zoom */
     }
-    /* Miniaturas: no mobile viram uma faixa horizontal logo abaixo da foto */
-    .toy-modal__card.has-thumbs .toy-modal__thumbs {
-      flex-direction: row;
-      overflow-x: auto;
-      overflow-y: hidden;
-      padding: 10px 12px;
-      border-right: 0;
-      border-bottom: 1px solid #f0f2f5;
-      order: 2;
-    }
+    /* Esconde lupa/hint no mobile — hover-zoom não funciona bem em touch */
+    .toy-modal__lens,
+    .toy-modal__zoom-hint { display: none !important; }
     .toy-modal__body {
       padding: 20px 20px 28px;
       border-left: 0;
-      order: 3;
+      order: 2;
     }
     .toy-modal__title { font-size: 24px; }
     .toy-modal__cta { width: 100%; }
@@ -830,7 +850,7 @@
           <article class="toy-card"
             data-toy-name="{{ t.name }}"
             data-toy-desc="{{ t.desc }}"
-            data-toy-imgs="{{ t.imgs }}"
+            data-toy-img="{{ t.img }}"
             role="button" tabindex="0"
             aria-label="Ver detalhes de {{ t.name }}">
             <img class="toy-card__img" src="{{ t.img }}" alt="{{ t.name }}" loading="lazy" decoding="async">
@@ -863,7 +883,7 @@
             <article class="toy-card"
               data-toy-name="{{ t.name }}"
               data-toy-desc="{{ t.desc }}"
-              data-toy-imgs="{{ t.imgs }}"
+              data-toy-img="{{ t.img }}"
               role="button" tabindex="0"
               aria-label="Ver detalhes de {{ t.name }}">
               <img class="toy-card__img" src="{{ t.img }}" alt="{{ t.name }}" loading="lazy" decoding="async">
@@ -883,24 +903,33 @@
 
     <!-- ==========================================================
          MODAL DO BRINQUEDO — reaproveitado por qualquer card.
-         Preparado pra múltiplas imagens (miniaturas embaixo).
-         Enquanto só houver 1 imagem por brinquedo, a faixa de
-         miniaturas fica escondida automaticamente (has-many).
+         Layout em 2 colunas: foto grande à esquerda (com lupa de
+         zoom que segue o cursor no desktop) + descrição/CTA à
+         direita. Mobile empilha em coluna única.
          ========================================================== -->
     <div class="toy-modal" id="toyModal" role="dialog" aria-modal="true" aria-labelledby="toyModalTitle" aria-hidden="true">
       <div class="toy-modal__backdrop" data-modal-close></div>
       <div class="toy-modal__card" id="toyModalCard">
         <button type="button" class="toy-modal__close" data-modal-close aria-label="Fechar">×</button>
 
-        <!-- coluna 1: miniaturas (aparecem se houver >1 imagem via .has-thumbs no card) -->
-        <div class="toy-modal__thumbs" id="toyModalThumbs"></div>
-
-        <!-- coluna 2: foto principal -->
-        <div class="toy-modal__stage">
-          <img class="toy-modal__main-img" id="toyModalMainImg" src="" alt="">
+        <!-- coluna 1: foto principal com lupa de zoom (segue o cursor no desktop) -->
+        <div class="toy-modal__stage" id="toyModalStage">
+          <div class="toy-modal__stage-wrap">
+            <img class="toy-modal__main-img" id="toyModalMainImg" src="" alt="">
+            <div class="toy-modal__lens" id="toyModalLens" aria-hidden="true"></div>
+          </div>
+          <div class="toy-modal__zoom-hint" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="7"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              <line x1="11" y1="8" x2="11" y2="14"></line>
+              <line x1="8" y1="11" x2="14" y2="11"></line>
+            </svg>
+            Passe o mouse pra ampliar
+          </div>
         </div>
 
-        <!-- coluna 3: conteúdo -->
+        <!-- coluna 2: conteúdo -->
         <div class="toy-modal__body">
           <span class="toy-modal__eyebrow">Locação · <strong>Mundo Feliz</strong></span>
           <h3 class="toy-modal__title" id="toyModalTitle"></h3>
@@ -1084,57 +1113,60 @@
 class Component extends DCLogic {
   renderVals() {
     // Em modo standalone, as imagens vêm de window.__resources (blob URLs).
+    // Os IDs abaixo batem com os <meta name="ext-resource-dependency"> no <head>.
     const R = (typeof window !== 'undefined' && window.__resources) || {};
+
+    // Helper pra fallback do path direto quando não estamos em modo bundle
+    const img = (id, path) => R[id] || path;
+
     return {
-      // Imagens disponíveis hoje (3). Enquanto não subimos as reais dos brinquedos
-      // extras, reaproveitamos essas três em rodízio como placeholder visual.
-      // O campo `imgs` é uma lista pipe-separada — no dia em que existir mais de
-      // uma foto por brinquedo, o modal já mostra automaticamente as miniaturas.
+      // ============================================================
+      // 3 BRINQUEDOS EM DESTAQUE — os inflaveis maiores, que puxam
+      // a atenção primeiro. Restante fica no "Ver catálogo completo".
+      // ============================================================
       toys: [
+        { name: 'Tombo Legal',
+          desc: 'Torre inflável com piscina de bolinhas e escalada colorida. Um dos brinquedos que mais faz sucesso na festa — as crianças sobem, escorregam e caem direto no mar de bolinhas.',
+          img: img('tomboLegal', 'uploads/tombo-legal.png') },
+        { name: 'Tobogã Premium',
+          desc: 'Escorregador inflável gigante (4,5m de comprimento × 2,80m de largura × 4,0m de altura) com escalada e descida em alta velocidade. Vira a atração principal da festa.',
+          img: img('tobogaPremium', 'uploads/toboga-premium.png') },
         { name: 'Piscina de Bolinhas',
-          desc: 'Mergulho colorido de diversão pros pequenos. Higienizada, com bolinhas novas e proteção em todas as bordas — clássico que nunca falha em festa infantil.',
-          img: R.toy1 || 'uploads/toy1.png',
-          imgs: (R.toy1 || 'uploads/toy1.png') },
-        { name: 'Barco Pirata',
-          desc: 'Tobogã inflável gigante em forma de navio pirata. Escalada, escorrega e muita aventura — o brinquedo que vira a atração principal da festa.',
-          img: R.toy2 || 'uploads/toy2.png',
-          imgs: (R.toy2 || 'uploads/toy2.png') },
-        { name: 'Tenda de Bolinhas',
-          desc: 'Tenda inflável espaçosa, perfeita pra festas em casa. Ideal pra crianças menores brincarem com segurança e conforto num espaço só delas.',
-          img: R.toy3 || 'uploads/toy3.png',
-          imgs: (R.toy3 || 'uploads/toy3.png') }
+          desc: 'Piscina de bolinhas com tenda colorida e tela de proteção 360°. Ideal pra crianças menores brincarem com segurança e conforto num espaço só delas.',
+          img: img('piscinaBolinhas', 'uploads/piscina-bolinhas.png') }
       ],
-      // Brinquedos extras — revelados no clique de "Ver catálogo completo".
-      // Total do catálogo: 3 principais + 7 extras = 10 cards.
+      // ============================================================
+      // BRINQUEDOS EXTRAS — revelados no clique de "Ver catálogo
+      // completo". Total do catálogo: 3 principais + 9 extras = 12.
+      // ============================================================
       toysExtra: [
-        { name: 'Castelo Inflável',
-          desc: 'Castelo inflável colorido com área ampla pra pular. Um dos brinquedos mais pedidos pra festas de aniversário — diversão garantida do começo ao fim.',
-          img: R.toy1 || 'uploads/toy1.png',
-          imgs: (R.toy1 || 'uploads/toy1.png') },
-        { name: 'Tobogã Gigante',
-          desc: 'Escorregador inflável enorme, com escalada e descida em alta velocidade. Traz aquela sensação de parque aquático direto pro quintal.',
-          img: R.toy2 || 'uploads/toy2.png',
-          imgs: (R.toy2 || 'uploads/toy2.png') },
         { name: 'Cama Elástica',
-          desc: 'Cama elástica com tela de proteção 360°. Segura, resistente e com aquela alegria clássica de pular sem parar. Acompanha equipe pra montagem.',
-          img: R.toy3 || 'uploads/toy3.png',
-          imgs: (R.toy3 || 'uploads/toy3.png') },
-        { name: 'Escorregador Aquático',
-          desc: 'Escorregador inflável com jato de água — perfeito pra festas de verão. Vem com bomba e todo o kit de instalação pronto pra usar.',
-          img: R.toy1 || 'uploads/toy1.png',
-          imgs: (R.toy1 || 'uploads/toy1.png') },
-        { name: 'Touro Mecânico Kids',
-          desc: 'Versão infantil do touro mecânico, com velocidade controlada e almofadas de proteção. Faz sucesso absoluto com a criançada mais aventureira.',
-          img: R.toy2 || 'uploads/toy2.png',
-          imgs: (R.toy2 || 'uploads/toy2.png') },
-        { name: 'Circuito de Obstáculos',
-          desc: 'Estrutura inflável longa com túneis, escaladas e obstáculos. Ótimo pra grupos maiores — divide as crianças em times e vira brincadeira coletiva.',
-          img: R.toy3 || 'uploads/toy3.png',
-          imgs: (R.toy3 || 'uploads/toy3.png') },
-        { name: 'Kid Play com Escorregador',
-          desc: 'Playground inflável compacto com escorregador e área de pulo. Perfeito pra festas com espaço mais reduzido, sem abrir mão da diversão.',
-          img: R.toy1 || 'uploads/toy1.png',
-          imgs: (R.toy1 || 'uploads/toy1.png') }
+          desc: 'Cama elástica grande com tela de proteção 360° e escada acolchoada. Segura, resistente e com aquela alegria clássica de pular sem parar. Acompanha equipe pra montagem.',
+          img: img('camaElastica', 'uploads/cama-elastica.png') },
+        { name: 'Mini Centopéia',
+          desc: 'Inflável em formato de centopéia com escorregador e escalada — 5,0m de comprimento × 2,10m de largura × 3,0m de altura. Diversão colorida e temática pros pequenos.',
+          img: img('miniCentopeia', 'uploads/mini-centopeia.png') },
+        { name: 'Touro Mecânico',
+          desc: 'Touro mecânico profissional com colchão inflável de 4,5m × 4,5m ao redor, velocidade controlada e total segurança. Faz sucesso absoluto com adolescentes e adultos aventureiros.',
+          img: img('touroMecanico', 'uploads/touro-mecanico.png') },
+        { name: 'Mini Tobogã Tigrinho',
+          desc: 'Tobogã inflável menor no tema tigre, com escorregador e área de pulo. Perfeito pra festas com espaço reduzido — mantém toda a diversão em formato compacto.',
+          img: img('miniTobogaTigrinho', 'uploads/mini-toboga-tigrinho.png') },
+        { name: 'Futebol de Sabão',
+          desc: 'Arena inflável longa com traves e piso escorregadio de sabão. Diversão garantida em grupo — vira o campeonato oficial da festa, com direito a plateia rindo do lado de fora.',
+          img: img('futebolSabao', 'uploads/futebol-sabao.png') },
+        { name: 'Totó',
+          desc: 'Mesa de pebolim (totó) de madeira profissional, com jogadores em ferro e placar embutido. Clássico atemporal que junta crianças, adolescentes e adultos ao redor da mesa.',
+          img: img('toto', 'uploads/toto.png') },
+        { name: 'Ping Pong',
+          desc: 'Mesa oficial de ping pong (1,85m × 1,00m) com raquetes e bolinhas inclusas. Diversão que atravessa gerações — perfeita pra torneios rápidos entre convidados.',
+          img: img('pingPong', 'uploads/ping-pong.png') },
+        { name: 'Algodão Doce',
+          desc: 'Máquina profissional de algodão doce em aço inox, com controle de saída e reset de emergência. Aroma característico que perfuma a festa inteira — acompanha açúcar colorido.',
+          img: img('algodaoDoce', 'uploads/algodao-doce.png') },
+        { name: 'Pipoqueira Elétrica',
+          desc: 'Pipoqueira profissional estilo cinema, com vitrine iluminada e capacidade generosa. Pipoca fresquinha durante toda a festa — clássico que ninguém resiste.',
+          img: img('pipoqueira', 'uploads/pipoqueira.png') }
       ]
     };
   }
@@ -1225,11 +1257,10 @@ class Component extends DCLogic {
     // CATÁLOGO — toggle "Ver catálogo completo" + modal do brinquedo
     // ------------------------------------------------------------
     // - Cada card (.toy-card) carrega os dados nos data-attrs
-    //   (data-toy-name, data-toy-desc, data-toy-imgs).
-    // - data-toy-imgs é pipe-separado ("url1|url2|..."). Enquanto
-    //   houver só 1 imagem, a faixa de miniaturas fica escondida
-    //   (classe .has-many controla). No dia em que subir mais
-    //   fotos por brinquedo, é só passar mais URLs separadas por |.
+    //   (data-toy-name, data-toy-desc, data-toy-img).
+    // - Uma única imagem por brinquedo. No modal, a imagem principal
+    //   tem uma LUPA DE ZOOM que segue o cursor (desktop) — permite
+    //   ver detalhes da foto sem precisar de miniaturas.
     // ============================================================
     const WHATSAPP_NUMBER = '5531992567510'; // mesmo número da seção de contato
 
@@ -1253,7 +1284,8 @@ class Component extends DCLogic {
     const modalTitle   = document.getElementById('toyModalTitle');
     const modalDesc    = document.getElementById('toyModalDesc');
     const modalMainImg = document.getElementById('toyModalMainImg');
-    const modalThumbs  = document.getElementById('toyModalThumbs');
+    const modalStage   = document.getElementById('toyModalStage');
+    const modalLens    = document.getElementById('toyModalLens');
     const modalCta     = document.getElementById('toyModalCta');
 
     const buildWhatsappHref = (toyName) => {
@@ -1265,7 +1297,7 @@ class Component extends DCLogic {
     const readToy = (cardEl) => ({
       name: cardEl.dataset.toyName || '',
       desc: cardEl.dataset.toyDesc || '',
-      imgs: cardEl.dataset.toyImgs || ''
+      img:  cardEl.dataset.toyImg  || ''
     });
 
     const openModal = (toy) => {
@@ -1273,34 +1305,15 @@ class Component extends DCLogic {
       modalTitle.textContent = toy.name;
       modalDesc.textContent  = toy.desc;
 
-      // Galeria: divide o pipe-separado em array.
-      const imgs = (toy.imgs || '').split('|').map(s => s.trim()).filter(Boolean);
-      const first = imgs[0] || '';
-      modalMainImg.src = first;
+      // Só uma imagem por brinquedo agora — sem galeria de miniaturas.
+      modalMainImg.src = toy.img || '';
       modalMainImg.alt = toy.name;
 
-      // Miniaturas SEMPRE visíveis. Enquanto o brinquedo tiver só 1 foto,
-      // a gente repete essa mesma imagem pra mostrar o affordance da galeria.
-      // Quando você subir fotos reais (pipe-separadas em `imgs`), passa a
-      // mostrar cada uma automaticamente.
-      const thumbList = imgs.length > 1 ? imgs : (first ? [first, first, first, first] : []);
-      modalThumbs.innerHTML = '';
-      if (thumbList.length > 0) {
-        modalCardEl.classList.add('has-thumbs');
-        thumbList.forEach((url, i) => {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'toy-modal__thumb' + (i === 0 ? ' is-active' : '');
-          btn.innerHTML = `<img src="${url}" alt="">`;
-          btn.addEventListener('click', () => {
-            modalMainImg.src = url;
-            modalThumbs.querySelectorAll('.toy-modal__thumb').forEach(t => t.classList.remove('is-active'));
-            btn.classList.add('is-active');
-          });
-          modalThumbs.appendChild(btn);
-        });
-      } else {
-        modalCardEl.classList.remove('has-thumbs');
+      // Prepara a lupa: a background-image dela é a MESMA imagem em zoom,
+      // e o background-position é calculado pelo mouse via setupZoomLens.
+      if (modalLens) {
+        modalLens.style.backgroundImage = toy.img ? `url("${toy.img}")` : '';
+        modalLens.classList.remove('is-visible');
       }
 
       modalCta.href = buildWhatsappHref(toy.name);
@@ -1309,6 +1322,76 @@ class Component extends DCLogic {
       modal.setAttribute('aria-hidden', 'false');
       document.body.classList.add('toy-modal-open');
     };
+
+    // ============================================================
+    // LUPA DE ZOOM — ampliação estilo e-commerce (Mercado Livre)
+    // ------------------------------------------------------------
+    // Ao mover o mouse sobre a imagem principal do modal, uma lupa
+    // circular aparece seguindo o cursor. Ela usa a MESMA imagem em
+    // zoom (2.5x) como background, com background-position calculado
+    // proporcionalmente à posição do cursor sobre a imagem.
+    //
+    // Detalhes:
+    // - ZOOM: fator de ampliação. 2.5x = confortável pra ver textura
+    //   sem pixelar demais imagens de resolução média.
+    // - Desabilitada em telas mobile (via CSS) — hover não funciona
+    //   bem em touch, e o usuário mobile já pode dar pinch-zoom no
+    //   navegador se quiser detalhes.
+    // ============================================================
+    if (modalStage && modalMainImg && modalLens) {
+      const ZOOM = 2.5;
+
+      const updateLens = (ev) => {
+        const rect = modalMainImg.getBoundingClientRect();
+        const stageRect = modalStage.getBoundingClientRect();
+
+        // Posição do cursor RELATIVA à imagem (não ao stage)
+        const x = ev.clientX - rect.left;
+        const y = ev.clientY - rect.top;
+
+        // Se saiu dos limites da imagem, esconde a lupa
+        if (x < 0 || y < 0 || x > rect.width || y > rect.height) {
+          modalLens.classList.remove('is-visible');
+          modalStage.classList.remove('is-zooming');
+          return;
+        }
+
+        // Tamanho da imagem ampliada (fundo da lupa)
+        const bgW = rect.width  * ZOOM;
+        const bgH = rect.height * ZOOM;
+
+        // Posiciona a lupa RELATIVA ao stage (o pai posicionado)
+        const lensX = ev.clientX - stageRect.left;
+        const lensY = ev.clientY - stageRect.top;
+        modalLens.style.left = lensX + 'px';
+        modalLens.style.top  = lensY + 'px';
+        modalLens.style.display = 'block';
+
+        // Metade do tamanho da lupa (pra centralizar o ponto sob o cursor)
+        const lensSize = modalLens.offsetWidth;
+        const half = lensSize / 2;
+
+        // Position do background: puxa a imagem ampliada de forma que o
+        // ponto sob o cursor fique CENTRALIZADO no círculo da lupa.
+        const bgX = -(x * ZOOM - half);
+        const bgY = -(y * ZOOM - half);
+
+        modalLens.style.backgroundSize = bgW + 'px ' + bgH + 'px';
+        modalLens.style.backgroundPosition = bgX + 'px ' + bgY + 'px';
+        modalLens.classList.add('is-visible');
+        modalStage.classList.add('is-zooming');
+      };
+
+      const hideLens = () => {
+        modalLens.classList.remove('is-visible');
+        modalStage.classList.remove('is-zooming');
+      };
+
+      // Escuta no stage inteiro (não só na imagem) pra evitar flicker
+      // quando o cursor cruza a borda do wrapper interno.
+      modalStage.addEventListener('mousemove', updateLens);
+      modalStage.addEventListener('mouseleave', hideLens);
+    }
 
     const closeModal = () => {
       if (!modal) return;
@@ -1360,7 +1443,7 @@ class Component extends DCLogic {
     // ao clicar numa sugestão, abre o mesmo modal do catálogo.
     // ------------------------------------------------------------
     // Fonte de dados: os próprios .toy-card renderizados no DOM
-    // (data-toy-name / data-toy-desc / data-toy-imgs). Assim a
+    // (data-toy-name / data-toy-desc / data-toy-img). Assim a
     // busca cobre AUTOMATICAMENTE tanto os brinquedos principais
     // quanto os "extras" — sem precisar duplicar a lista aqui.
     // ============================================================
@@ -1380,12 +1463,10 @@ class Component extends DCLogic {
           const name = (card.dataset.toyName || '').trim();
           if (!name || seen.has(name.toLowerCase())) return;
           seen.add(name.toLowerCase());
-          const imgs = (card.dataset.toyImgs || '').split('|').map(s => s.trim()).filter(Boolean);
           list.push({
             name,
             desc: card.dataset.toyDesc || '',
-            imgs: card.dataset.toyImgs || '',
-            thumb: imgs[0] || ''
+            img:  card.dataset.toyImg  || ''
           });
         });
         return list;
@@ -1421,7 +1502,7 @@ class Component extends DCLogic {
             item.setAttribute('role', 'option');
             item.dataset.idx = String(i);
             item.innerHTML = `
-              <img class="hero-search__thumb" src="${toy.thumb}" alt="" loading="lazy">
+              <img class="hero-search__thumb" src="${toy.img}" alt="" loading="lazy">
               <div class="hero-search__info">
                 <span class="hero-search__name"></span>
                 <span class="hero-search__cat">Locação · Mundo Feliz</span>
@@ -1446,7 +1527,7 @@ class Component extends DCLogic {
         if (!toy) return;
         closeSearchPanel();
         searchInput.blur();
-        openModal({ name: toy.name, desc: toy.desc, imgs: toy.imgs });
+        openModal({ name: toy.name, desc: toy.desc, img: toy.img });
       };
 
       const openSearchPanel = () => {
