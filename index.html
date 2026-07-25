@@ -67,24 +67,6 @@
   }
 
   /* ============================================================
-     PERFORMANCE: content-visibility pras seções abaixo da dobra.
-     ------------------------------------------------------------
-     Isso faz o navegador PULAR o render (layout + paint) dessas
-     seções até elas chegarem perto da viewport. Ganho de LCP e
-     TTI grande em páginas longas com muito conteúdo pesado.
-
-     contain-intrinsic-size = tamanho estimado enquanto não renderiza
-     (evita salto do scrollbar quando o browser resolve renderizar).
-     ============================================================ */
-  #catalogo { content-visibility: auto; contain-intrinsic-size: 1px 2400px; }
-  #contato  { content-visibility: auto; contain-intrinsic-size: 1px 1600px; }
-
-  /* Os cards do catálogo se beneficiam de contain: paint — isola o
-     paint layer de cada card pra não repintar toda a lista quando um
-     card individual muda (hover, foco). */
-  .toy-card { contain: paint; }
-
-  /* ============================================================
      REVIEWS (Google Maps style) — desktop default
      ------------------------------------------------------------
      Classes usam padrão BEM (reviews__grid, review-card__head,
