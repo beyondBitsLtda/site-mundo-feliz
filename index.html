@@ -3,18 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="ext-resource-dependency" content="uploads/tombo-legal.png" data-resource-id="tomboLegal" />
-<meta name="ext-resource-dependency" content="uploads/toboga-premium.png" data-resource-id="tobogaPremium" />
-<meta name="ext-resource-dependency" content="uploads/piscina-bolinhas.png" data-resource-id="piscinaBolinhas" />
-<meta name="ext-resource-dependency" content="uploads/cama-elastica.png" data-resource-id="camaElastica" />
-<meta name="ext-resource-dependency" content="uploads/mini-centopeia.png" data-resource-id="miniCentopeia" />
-<meta name="ext-resource-dependency" content="uploads/touro-mecanico.png" data-resource-id="touroMecanico" />
-<meta name="ext-resource-dependency" content="uploads/mini-toboga-tigrinho.png" data-resource-id="miniTobogaTigrinho" />
-<meta name="ext-resource-dependency" content="uploads/toto.png" data-resource-id="toto" />
-<meta name="ext-resource-dependency" content="uploads/ping-pong.png" data-resource-id="pingPong" />
-<meta name="ext-resource-dependency" content="uploads/futebol-sabao.png" data-resource-id="futebolSabao" />
-<meta name="ext-resource-dependency" content="uploads/algodao-doce.png" data-resource-id="algodaoDoce" />
-<meta name="ext-resource-dependency" content="uploads/pipoqueira.png" data-resource-id="pipoqueira" />
+<meta name="ext-resource-dependency" content="uploads/tombo-legal.webp" data-resource-id="tomboLegal" />
+<meta name="ext-resource-dependency" content="uploads/toboga-premium.webp" data-resource-id="tobogaPremium" />
+<meta name="ext-resource-dependency" content="uploads/piscina-bolinhas.webp" data-resource-id="piscinaBolinhas" />
+<meta name="ext-resource-dependency" content="uploads/cama-elastica.webp" data-resource-id="camaElastica" />
+<meta name="ext-resource-dependency" content="uploads/mini-centopeia.webp" data-resource-id="miniCentopeia" />
+<meta name="ext-resource-dependency" content="uploads/touro-mecanico.webp" data-resource-id="touroMecanico" />
+<meta name="ext-resource-dependency" content="uploads/mini-toboga-tigrinho.webp" data-resource-id="miniTobogaTigrinho" />
+<meta name="ext-resource-dependency" content="uploads/toto.webp" data-resource-id="toto" />
+<meta name="ext-resource-dependency" content="uploads/ping-pong.webp" data-resource-id="pingPong" />
+<meta name="ext-resource-dependency" content="uploads/futebol-sabao.webp" data-resource-id="futebolSabao" />
+<meta name="ext-resource-dependency" content="uploads/algodao-doce.webp" data-resource-id="algodaoDoce" />
+<meta name="ext-resource-dependency" content="uploads/pipoqueira.webp" data-resource-id="pipoqueira" />
 <script src="./support.js"></script>
 </head>
 <body>
@@ -36,10 +36,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,800;1,9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <!-- ============================================================ -->
-<!-- PERFORMANCE: preload das imagens críticas do hero (above-fold) -->
+<!-- PERFORMANCE: preload APENAS do logo do hero (critical LCP).   -->
+<!-- As bolinhas decorativas de fundo NÃO precisam de preload —    -->
+<!-- carregam junto sem bloquear o render inicial.                 -->
 <!-- ============================================================ -->
 <link rel="preload" as="image" href="uploads/assets hero - globo e mundo feliz.png" fetchpriority="high">
-<link rel="preload" as="image" href="uploads/estilo (3).png">
 
 <style>
   html, body { margin: 0; padding: 0; }
@@ -64,6 +65,25 @@
   @media (prefers-reduced-motion: reduce) {
     .parallax { transform: none !important; }
   }
+
+  /* ============================================================
+     PERFORMANCE: content-visibility pras seções abaixo da dobra.
+     ------------------------------------------------------------
+     Isso faz o navegador PULAR o render (layout + paint) dessas
+     seções até elas chegarem perto da viewport. Ganho de LCP e
+     TTI grande em páginas longas com muito conteúdo pesado.
+
+     contain-intrinsic-size = tamanho estimado enquanto não renderiza
+     (evita salto do scrollbar quando o browser resolve renderizar).
+     ============================================================ */
+  #catalogo { content-visibility: auto; contain-intrinsic-size: 1px 2400px; }
+  #contato  { content-visibility: auto; contain-intrinsic-size: 1px 1600px; }
+
+  /* Os cards do catálogo se beneficiam de contain: paint — isola o
+     paint layer de cada card pra não repintar toda a lista quando um
+     card individual muda (hover, foco). */
+  .toy-card { contain: paint; }
+</style>
 
   /* ============================================================
      REVIEWS (Google Maps style) — desktop default
@@ -503,17 +523,21 @@
   body.toy-modal-open { overflow: hidden; }
 
   /* ============================================================
-     BARRA DE PESQUISA (hero) — translúcida, arredondada, com
-     sugestões flutuantes que abrem o modal do brinquedo.
-     Isolada por classe .hero-search pra não vazar em outros
-     lugares da página.
+     BARRA DE PESQUISA (hero) — POSICIONADA NO TOPO da seção hero.
+     - Position absolute pra "descolar" do logo e ficar próxima do
+       topo da página (~24px do topo, centralizada horizontalmente).
+     - Isso libera o logo pra ficar bem centralizado verticalmente
+       no hero, sem competir com a busca por espaço.
+     - Isolada por classe .hero-search pra não vazar em outros
+       lugares da página.
      ============================================================ */
   .hero-search {
-    position: relative;
-    width: 100%;
+    position: absolute;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 48px);   /* respiro de 24px pros lados */
     max-width: 560px;
-    /* margem inferior maior pra afastar do logo — antes 28px */
-    margin: 0 auto 64px;
     z-index: 20;   /* precisa ficar acima dos CTAs e do parallax */
   }
   .hero-search__box {
@@ -746,10 +770,10 @@
     .reviews-section { margin-top: 56px; }
 
     /* --- 4) BARRA DE PESQUISA no mobile ---
-       Compacta o padding e limita a altura do painel de sugestões
-       pra não cobrir o botão de CTA. Margem inferior generosa pra
-       ficar bem separada do logo. */
-    .hero-search { margin-bottom: 56px; }
+       Agora fica absolute no topo do hero (não empurra o logo).
+       Compacta padding e limita a altura do painel de sugestões
+       pra não cobrir os CTAs. */
+    .hero-search { top: 16px; }
     .hero-search__box { padding: 12px 18px; }
     .hero-search__input { font-size: 15px; }
     .hero-search__panel { max-height: 300px; }
@@ -772,34 +796,34 @@
       fetchpriority="high" decoding="async"
       style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.95; z-index:1;">
 
+    <!-- ============================================================
+         BARRA DE PESQUISA — POSICIONADA NO TOPO do hero (absolute).
+         - Fica próxima ao topo da página, bem visível de cara.
+         - Independente do logo (não empurra ele pra baixo).
+         - O painel de sugestões (.hero-search__panel) é populado
+           dinamicamente no componentDidMount lendo os data-attrs
+           de todos os .toy-card (principais + extras).
+         - Clique numa sugestão reaproveita openModal() do modal
+           do catálogo — mesma UX de clicar num card.
+         ============================================================ -->
+    <div class="hero-search" id="heroSearch" role="search">
+      <label class="hero-search__box" for="heroSearchInput">
+        <svg class="hero-search__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input id="heroSearchInput" class="hero-search__input" type="text"
+          placeholder="Qual brinquedo vai bombar a sua festa?"
+          autocomplete="off" spellcheck="false"
+          aria-label="Pesquisar brinquedos no catálogo"
+          aria-controls="heroSearchPanel" aria-expanded="false">
+        <button type="button" class="hero-search__clear" id="heroSearchClear" aria-label="Limpar pesquisa">×</button>
+      </label>
+      <div class="hero-search__panel" id="heroSearchPanel" role="listbox" aria-label="Sugestões de brinquedos"></div>
+    </div>
+
     <!-- logo central -->
     <div style="position:relative; z-index:3; text-align:center; width:100%; max-width:1220px; display:flex; flex-direction:column; align-items:center;">
-
-      <!-- ============================================================
-           BARRA DE PESQUISA — fica no TOPO do hero, acima do logo.
-           - .hero-search abre/fecha via classes .is-open / .has-value
-             adicionadas pelo JS.
-           - O painel de sugestões (.hero-search__panel) é populado
-             dinamicamente no componentDidMount lendo os data-attrs
-             de todos os .toy-card (principais + extras).
-           - Clique numa sugestão reaproveita openModal() do modal
-             do catálogo — mesma UX de clicar num card.
-           ============================================================ -->
-      <div class="hero-search" id="heroSearch" role="search">
-        <label class="hero-search__box" for="heroSearchInput">
-          <svg class="hero-search__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="11" cy="11" r="7"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input id="heroSearchInput" class="hero-search__input" type="text"
-            placeholder="Qual brinquedo vai bombar a sua festa?"
-            autocomplete="off" spellcheck="false"
-            aria-label="Pesquisar brinquedos no catálogo"
-            aria-controls="heroSearchPanel" aria-expanded="false">
-          <button type="button" class="hero-search__clear" id="heroSearchClear" aria-label="Limpar pesquisa">×</button>
-        </label>
-        <div class="hero-search__panel" id="heroSearchPanel" role="listbox" aria-label="Sugestões de brinquedos"></div>
-      </div>
 
       <img class="hero-logo" src="uploads/assets hero - globo e mundo feliz.png" alt="Mundo Feliz - Locações de Brinquedos"
         fetchpriority="high" decoding="async"
@@ -853,7 +877,8 @@
             data-toy-img="{{ t.img }}"
             role="button" tabindex="0"
             aria-label="Ver detalhes de {{ t.name }}">
-            <img class="toy-card__img" src="{{ t.img }}" alt="{{ t.name }}" loading="lazy" decoding="async">
+            <img class="toy-card__img" src="{{ t.img }}" alt="{{ t.name }}"
+              width="800" height="1000" loading="lazy" decoding="async">
             <div class="toy-card__fade"></div>
             <div class="toy-card__foot">
               <h3 class="toy-card__name">{{ t.name }}</h3>
@@ -886,7 +911,8 @@
               data-toy-img="{{ t.img }}"
               role="button" tabindex="0"
               aria-label="Ver detalhes de {{ t.name }}">
-              <img class="toy-card__img" src="{{ t.img }}" alt="{{ t.name }}" loading="lazy" decoding="async">
+              <img class="toy-card__img" src="{{ t.img }}" alt="{{ t.name }}"
+                width="800" height="1000" loading="lazy" decoding="async">
               <div class="toy-card__fade"></div>
               <div class="toy-card__foot">
                 <h3 class="toy-card__name">{{ t.name }}</h3>
@@ -1127,13 +1153,13 @@ class Component extends DCLogic {
       toys: [
         { name: 'Tombo Legal',
           desc: 'Torre inflável com piscina de bolinhas e escalada colorida. Um dos brinquedos que mais faz sucesso na festa — as crianças sobem, escorregam e caem direto no mar de bolinhas.',
-          img: img('tomboLegal', 'uploads/tombo-legal.png') },
+          img: img('tomboLegal', 'uploads/tombo-legal.webp') },
         { name: 'Tobogã Premium',
           desc: 'Escorregador inflável gigante (4,5m de comprimento × 2,80m de largura × 4,0m de altura) com escalada e descida em alta velocidade. Vira a atração principal da festa.',
-          img: img('tobogaPremium', 'uploads/toboga-premium.png') },
+          img: img('tobogaPremium', 'uploads/toboga-premium.webp') },
         { name: 'Piscina de Bolinhas',
           desc: 'Piscina de bolinhas com tenda colorida e tela de proteção 360°. Ideal pra crianças menores brincarem com segurança e conforto num espaço só delas.',
-          img: img('piscinaBolinhas', 'uploads/piscina-bolinhas.png') }
+          img: img('piscinaBolinhas', 'uploads/piscina-bolinhas.webp') }
       ],
       // ============================================================
       // BRINQUEDOS EXTRAS — revelados no clique de "Ver catálogo
@@ -1142,31 +1168,31 @@ class Component extends DCLogic {
       toysExtra: [
         { name: 'Cama Elástica',
           desc: 'Cama elástica grande com tela de proteção 360° e escada acolchoada. Segura, resistente e com aquela alegria clássica de pular sem parar. Acompanha equipe pra montagem.',
-          img: img('camaElastica', 'uploads/cama-elastica.png') },
+          img: img('camaElastica', 'uploads/cama-elastica.webp') },
         { name: 'Mini Centopéia',
           desc: 'Inflável em formato de centopéia com escorregador e escalada — 5,0m de comprimento × 2,10m de largura × 3,0m de altura. Diversão colorida e temática pros pequenos.',
-          img: img('miniCentopeia', 'uploads/mini-centopeia.png') },
+          img: img('miniCentopeia', 'uploads/mini-centopeia.webp') },
         { name: 'Touro Mecânico',
           desc: 'Touro mecânico profissional com colchão inflável de 4,5m × 4,5m ao redor, velocidade controlada e total segurança. Faz sucesso absoluto com adolescentes e adultos aventureiros.',
-          img: img('touroMecanico', 'uploads/touro-mecanico.png') },
+          img: img('touroMecanico', 'uploads/touro-mecanico.webp') },
         { name: 'Mini Tobogã Tigrinho',
           desc: 'Tobogã inflável menor no tema tigre, com escorregador e área de pulo. Perfeito pra festas com espaço reduzido — mantém toda a diversão em formato compacto.',
-          img: img('miniTobogaTigrinho', 'uploads/mini-toboga-tigrinho.png') },
+          img: img('miniTobogaTigrinho', 'uploads/mini-toboga-tigrinho.webp') },
         { name: 'Futebol de Sabão',
           desc: 'Arena inflável longa com traves e piso escorregadio de sabão. Diversão garantida em grupo — vira o campeonato oficial da festa, com direito a plateia rindo do lado de fora.',
-          img: img('futebolSabao', 'uploads/futebol-sabao.png') },
+          img: img('futebolSabao', 'uploads/futebol-sabao.webp') },
         { name: 'Totó',
           desc: 'Mesa de pebolim (totó) de madeira profissional, com jogadores em ferro e placar embutido. Clássico atemporal que junta crianças, adolescentes e adultos ao redor da mesa.',
-          img: img('toto', 'uploads/toto.png') },
+          img: img('toto', 'uploads/toto.webp') },
         { name: 'Ping Pong',
           desc: 'Mesa oficial de ping pong (1,85m × 1,00m) com raquetes e bolinhas inclusas. Diversão que atravessa gerações — perfeita pra torneios rápidos entre convidados.',
-          img: img('pingPong', 'uploads/ping-pong.png') },
+          img: img('pingPong', 'uploads/ping-pong.webp') },
         { name: 'Algodão Doce',
           desc: 'Máquina profissional de algodão doce em aço inox, com controle de saída e reset de emergência. Aroma característico que perfuma a festa inteira — acompanha açúcar colorido.',
-          img: img('algodaoDoce', 'uploads/algodao-doce.png') },
+          img: img('algodaoDoce', 'uploads/algodao-doce.webp') },
         { name: 'Pipoqueira Elétrica',
           desc: 'Pipoqueira profissional estilo cinema, com vitrine iluminada e capacidade generosa. Pipoca fresquinha durante toda a festa — clássico que ninguém resiste.',
-          img: img('pipoqueira', 'uploads/pipoqueira.png') }
+          img: img('pipoqueira', 'uploads/pipoqueira.webp') }
       ]
     };
   }
