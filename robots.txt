@@ -1,0 +1,27 @@
+User-agent: *
+Allow: /
+
+# Crawlers de motores de busca com IA (ChatGPT Search, Google AI Overviews,
+# Claude, Perplexity) — liberados explicitamente para indexar o conteúdo.
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+Sitemap: https://mundofelizlocacoes.com.br/sitemap.xml
