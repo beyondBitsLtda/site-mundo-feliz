@@ -15,6 +15,9 @@
 <meta name="ext-resource-dependency" content="uploads/futebol-sabao.webp" data-resource-id="futebolSabao" />
 <meta name="ext-resource-dependency" content="uploads/algodao-doce.webp" data-resource-id="algodaoDoce" />
 <meta name="ext-resource-dependency" content="uploads/pipoqueira.webp" data-resource-id="pipoqueira" />
+<meta name="ext-resource-dependency" content="uploads/castelinho-inflavel.jpg" data-resource-id="castelinhoInflavel" />
+<meta name="ext-resource-dependency" content="uploads/fliperama-air-game.jpeg" data-resource-id="fliperamaAirGame" />
+<meta name="ext-resource-dependency" content="uploads/mini-toboga.png" data-resource-id="miniToboga" />
 
 <!-- ============================================================ -->
 <!-- SEO: tags fundamentais no <head> ESTÁTICO (fora da <helmet>). -->
@@ -956,7 +959,7 @@
            Compartilha .toys-grid pra manter o mesmo layout do topo. -->
       <div class="toys-extra" id="toysGridExtra" aria-hidden="true">
         <div class="toys-grid">
-          <sc-for list="{{ toysExtra }}" as="t" hint-placeholder-count="7">
+          <sc-for list="{{ toysExtra }}" as="t" hint-placeholder-count="12">
             <article class="toy-card"
               data-toy-name="{{ t.name }}"
               data-toy-desc="{{ t.desc }}"
@@ -1217,7 +1220,7 @@ class Component extends DCLogic {
       ],
       // ============================================================
       // BRINQUEDOS EXTRAS — revelados no clique de "Ver catálogo
-      // completo". Total do catálogo: 3 principais + 9 extras = 12.
+      // completo". Total do catálogo: 3 principais + 12 extras = 15.
       // ============================================================
       toysExtra: [
         { name: 'Cama Elástica',
@@ -1246,7 +1249,16 @@ class Component extends DCLogic {
           img: img('algodaoDoce', 'uploads/algodao-doce.webp') },
         { name: 'Pipoqueira Elétrica',
           desc: 'Pipoqueira profissional estilo cinema, com vitrine iluminada e capacidade generosa. Pipoca fresquinha durante toda a festa — clássico que ninguém resiste.',
-          img: img('pipoqueira', 'uploads/pipoqueira.webp') }
+          img: img('pipoqueira', 'uploads/pipoqueira.webp') },
+        { name: 'Castelinho Inflável',
+          desc: 'Castelinho inflável de 3m × 3m, com pula-pula e escalada internos. Compacto e cheio de graça — perfeito pra festas com espaço menor sem abrir mão da diversão dos pequenos.',
+          img: img('castelinhoInflavel', 'uploads/castelinho-inflavel.jpg') },
+        { name: 'Fliperama e Air Game',
+          desc: 'Dupla clássica de arcade: fliperama com jogos variados e mesa de air game (air hockey) com discos e raquetes inclusos. Reúne crianças e adultos numa disputa animada.',
+          img: img('fliperamaAirGame', 'uploads/fliperama-air-game.jpeg') },
+        { name: 'Mini Tobogã',
+          desc: 'Escorregador inflável compacto — 3,30m de comprimento × 2,10m de largura × 2,30m de altura — com escalada e descida divertida. Ideal pra festas com espaço reduzido, sem perder a emoção do tobogã.',
+          img: img('miniToboga', 'uploads/mini-toboga.png') }
       ]
     };
   }
